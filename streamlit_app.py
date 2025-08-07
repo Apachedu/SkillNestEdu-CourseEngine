@@ -1,6 +1,3 @@
-import streamlit as st
-from engine import generate_content
-
 st.set_page_config(page_title="SkillNestEdu Course Engine", layout="centered")
 
 st.title("📘 SkillNestEdu Course Engine")
