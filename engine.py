@@ -8,10 +8,18 @@ def generate_content(subject, level, topic, subtopic=None):
             if subtopic == "Production Possibility Curve":
                 st.markdown(f"""
                 ## 📘 {level} - {topic}: {subtopic}
-                ### 📊 Interactive Diagram
+                ### 📊 Interactive Diagram with Explanation
                 """)
                 ppc_diagram()
+                st.markdown("""
+                **Explanation:**
+                - The curve is concave due to increasing opportunity cost.
+                - Points **inside** the curve = underutilization (inefficiency).
+                - Points **on** the curve = optimal utilization.
+                - Points **outside** = currently unattainable.
+                """)
                 return ""
+
             else:
                 return f"""
                 ## 📘 {level} - {topic}
@@ -25,6 +33,9 @@ def generate_content(subject, level, topic, subtopic=None):
                 - **Positive vs Normative Statements**
                 - **Economic Systems**
 
+                #### 🔍 Real-World Example:
+                Consider healthcare in a pandemic. Limited vaccines mean choices must be made.
+
                 #### ✅ Quick Quiz:
                 1. What is scarcity?
                 2. How do opportunity costs arise?
@@ -34,10 +45,24 @@ def generate_content(subject, level, topic, subtopic=None):
             if subtopic == "Price Elasticity Interactive":
                 st.markdown(f"""
                 ## 📘 {level} - {topic}: {subtopic}
-                ### 📊 Interactive Simulation
+                ### 📊 Elastic vs Inelastic Demand (Interactive)
                 """)
                 elasticity_diagram()
+                st.markdown("""
+                **Explanation:**
+                - Green = Elastic → Small price change → large quantity change
+                - Red = Inelastic → Large price change → small quantity change
+
+                **Try It:**
+                - Identify which curve represents luxury goods vs. necessities.
+                - Discuss implications for total revenue.
+
+                #### ✅ Quiz:
+                1. Where is demand more responsive?
+                2. What does a steeper curve imply?
+                """)
                 return ""
+
             else:
                 return f"""
                 ## 📘 {level} - {topic}
@@ -59,7 +84,7 @@ def generate_content(subject, level, topic, subtopic=None):
     elif subject == "Business Management":
         if topic == "Business Organization":
             return f"""
-            ## 📘 {level} - {topic}
+            ## 📘 {level} - Business Organization
 
             ### 🏢 What is a Business?
             A business is an organization that provides goods or services to satisfy needs and wants.
@@ -68,6 +93,9 @@ def generate_content(subject, level, topic, subtopic=None):
             - **Profit vs Non-profit**
             - **Sole Traders, Partnerships, Corporations**
             - **Social Enterprises**
+
+            #### 🧠 Critical Thinking Prompt:
+            Compare and contrast for-profit and social enterprises.
 
             #### ✅ Quick Quiz:
             1. Name three types of business ownership.
