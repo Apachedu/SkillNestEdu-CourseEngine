@@ -1,0 +1,43 @@
+Economics:
+  Foundations of Economics:
+    Production Possibility Curve:
+      type: diagram
+      function: ppc_diagram
+    Overview:
+      type: markdown
+      content: |
+        ### 🧠 What is Economics?
+        Economics is the study of how scarce resources are allocated among competing needs.
+
+        #### Key Concepts:
+        - **Scarcity and Choice**
+        - **Opportunity Cost**
+        - **Positive vs Normative Statements**
+        - **Economic Systems**
+
+        #### 🔍 Real-World Example:
+        Consider healthcare in a pandemic. Limited vaccines mean choices must be made.
+
+        #### ✅ Quick Quiz:
+        1. What is scarcity?
+        2. How do opportunity costs arise?
+
+  Elasticity:
+    Price Elasticity Interactive:
+      type: diagram
+      function: elasticity_diagram
+    Overview:
+      type: markdown
+      content: |
+        ### 📏 What is Price Elasticity of Demand?
+        It measures how quantity demanded changes in response to price changes.
+
+        #### Key Concepts:
+        - **PED Formula**
+        - **Determinants of Elasticity**
+        - **Elastic vs Inelastic Demand**
+        - **Total Revenue Relationship**
+
+        #### ✅ Quick Quiz:
+        1. What does it mean if PED > 1?
+        2. How does PED affect total revenue?

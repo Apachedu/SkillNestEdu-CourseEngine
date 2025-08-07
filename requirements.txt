@@ -1,1 +1,2 @@
+splotly>=5.20.0
 streamlit
