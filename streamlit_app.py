@@ -90,24 +90,99 @@ def fetch_doc_text(doc_id: str) -> str:
 
 def ppc_diagram():
     st.markdown("Use the slider to see shifts in production possibilities.")
-    slider = st.slider("Resource Index (0-10)", 0, 10, 5, key="ppc_slider")
-    x = np.linspace(0, 10, 100)
+    slider = st.slider("Resource / Technology Index (1–10)", 1, 10, 5, key="ppc_slider")
+
+    # Curve
+    x = np.linspace(0, 10, 200)
     y = slider - 0.5 * (x ** 2 / 10)
+    y = np.maximum(y, 0)  # keep chart tidy at extremes
+
     fig = go.Figure()
-    fig.add_trace(go.Scatter(x=x, y=y, mode="lines", name="PPC", line=dict(color="blue")))
+    fig.add_trace(go.Scatter(x=x, y=y, mode="lines", name="PPC", line=dict(color="#2563eb")))
+
+    # Three labelled points we talk about below
+    def y_at(val):
+        return slider - 0.5 * (val ** 2 / 10)
+
+    pts_x = [2, 6, 8]
+    pts_y = [y_at(2), y_at(6), y_at(8)]
     fig.add_trace(
         go.Scatter(
-            x=[2, 6, 8],
-            y=[slider - 0.5 * 2 ** 2 / 10, slider - 0.5 * 6 ** 2 / 10, slider - 0.5 * 8 ** 2 / 10],
+            x=pts_x,
+            y=pts_y,
             mode="markers+text",
             text=["A", "B", "C"],
             textposition="top center",
-            marker=dict(size=10, color="orange"),
+            marker=dict(size=10, color="#f59e0b"),
             name="Choices",
         )
     )
+
     fig.update_layout(title="Production Possibility Curve (PPC)", xaxis_title="Good A", yaxis_title="Good B")
     st.plotly_chart(fig, use_container_width=True)
+
+    # —— Dynamic explanation cards ——
+    baseline = 5
+    x_intercept = np.sqrt(20 * slider)  # when B = 0
+    y_intercept = slider                 # when A = 0
+
+    c1, c2, c3 = st.columns(3)
+    with c1:
+        st.metric("Max Good A (x‑intercept)", f"{x_intercept:.1f}", delta=f"{x_intercept - np.sqrt(20*baseline):.1f}")
+    with c2:
+        st.metric("Max Good B (y‑intercept)", f"{y_intercept:.1f}", delta=f"{y_intercept - baseline:.1f}")
+    with c3:
+        if slider > baseline:
+            st.success("Outward shift — more resources/productivity → larger attainable set.")
+        elif slider < baseline:
+            st.warning("Inward shift — resource loss/shock → smaller attainable set.")
+        else:
+            st.info("Baseline frontier.")
+
+    # —— Live opportunity cost coach ——
+    st.markdown("**Opportunity Cost (choose a movement):**")
+    move = st.radio(
+        "",
+        ["B → C (gain A)", "A → B (gain B)"],
+        horizontal=True,
+        key="ppc_move",
+    )
+    scale_label = st.radio(
+        "Units scale",
+        ["per 1 unit", "per 10 units", "per 100 units"],
+        horizontal=True,
+        key="ppc_scale",
+    )
+    scale = {"per 1 unit": 1, "per 10 units": 10, "per 100 units": 100}[scale_label]
+
+    yA, yB, yC = y_at(2), y_at(6), y_at(8)
+
+    if move.startswith("B"):
+        dA, dB = 8 - 6, yC - yB
+        oc = abs(dB / dA) if dA != 0 else float("nan")  # B per 1 A
+        oc_scaled = oc * scale
+        c1, c2, c3 = st.columns(3)
+        with c1:
+            st.metric("Gain in A", f"+{dA:.0f} units")
+        with c2:
+            st.metric("Loss in B", f"{abs(dB):.1f} units")
+        with c3:
+            st.metric(f"OC (B per {scale} A)", f"{oc_scaled:.0f}" if scale > 1 else f"{oc:.2f}")
+        st.caption(f"Per unit view: **{oc:.2f} B per 1 A**.")
+    else:
+        dB, dA = (yB - yA), 6 - 2
+        oc = abs(dA / dB) if dB != 0 else float("nan")  # A per 1 B
+        oc_scaled = oc * scale
+        c1, c2, c3 = st.columns(3)
+        with c1:
+            st.metric("Gain in B", f"+{dB:.1f} units")
+        with c2:
+            st.metric("Loss in A", f"{abs(dA):.0f} units")
+        with c3:
+            st.metric(f"OC (A per {scale} B)", f"{oc_scaled:.0f}" if scale > 1 else f"{oc:.2f}")
+        st.caption(f"Per unit view: **{oc:.2f} A per 1 B**.")
+
+    st.markdown("_Tip: On a concave PPC, OC rises as you move right—resources are s
 
 
 def elasticity_diagram():
@@ -626,7 +701,9 @@ def render_mcqs(items: List[Dict[str, Any]]):
     section_title("MCQs (check your understanding)")
     for i, mc in enumerate(items, 1):
         key = f"mcq_{i}"
-        labels = [f"{k}. {v}" for k, v in mc["options"].items()]
+        # Stable option order A→D to avoid widget churn
+        order = ["A", "B", "C", "D"]
+        labels = [f"{k}. {mc['options'][k]}" for k in order if k in mc["options"]]
         choice_label = st.radio(mc["question"], labels, key=key)
         if choice_label:
             choice_key = choice_label.split(".")[0]
@@ -635,6 +712,7 @@ def render_mcqs(items: List[Dict[str, Any]]):
             else:
                 st.error(f"Not quite. {mc['rationales'][choice_key]}")
                 st.info(f"✅ Correct answer: {mc['answer']}. {mc['rationales'][mc['answer']]}")
+
 
 
 def render_exit_ticket(items: List[str]):
@@ -732,11 +810,11 @@ def learn_mode(subject: str, level: str, topic: str, subtopic: str | None, teach
 
     col_prev, col_next = st.columns(2)
     with col_prev:
-        if st.button("⬅️ Back", disabled=idx == 0):
+        if st.button("⬅️ Back", key=f"back_{key}_{idx}", disabled=idx == 0):
             st.session_state[key] = max(0, idx - 1)
             st.rerun()
     with col_next:
-        if st.button("Next ➡️", disabled=idx == len(steps) - 1):
+        if st.button("Next ➡️", key=f"next_{key}_{idx}", disabled=idx == len(steps) - 1):
             st.session_state[key] = min(len(steps) - 1, idx + 1)
             st.rerun()
 
@@ -777,7 +855,7 @@ else:
 
 # Start Learn Mode: set active signature in session state, render exactly once per run
 signature = f"{subject}|{topic}|{sub or 'Overview'}"
-start_clicked = st.button("Start Learn Mode ▶️")
+start_clicked = st.button("Start Learn Mode ▶️", key="start_learn")
 if start_clicked:
     st.session_state["learn_active"] = True
     st.session_state["active_signature"] = signature
@@ -786,8 +864,3 @@ if start_clicked:
 
 if st.session_state.get("learn_active") and st.session_state.get("active_signature") == signature:
     learn_mode(subject, level, topic, sub, teacher_mode)
-
-# Optional debug (hidden unless DEV_MODE is enabled)
-if st.secrets.get("DEV_MODE") or os.environ.get("DEV_MODE"):
-    with st.expander("Show raw CONFIG"):
-        st.json(CONFIG)
