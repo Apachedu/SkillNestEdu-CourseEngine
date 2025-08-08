@@ -1,54 +1,23 @@
+# ================= SkillNestEdu Course Engine (FULL) =================
+# Streamlit app: self‑study lesson builder with teacher view
+# - Loads content from /content/*.yml via content_loader.py
+# - Password‑gated teacher sidebar
+# - Interactive PPC + Elasticity diagrams
+# ====================================================================
+
 from __future__ import annotations
 
 import os
-from typing import Dict, Any, List
+import json
+from typing import Dict, Any, List, Tuple
 
 import streamlit as st
 import plotly.graph_objects as go
 import numpy as np
 
-# Load YAML content (built‑in safe loader — ignores external content_loader.py)
-import yaml
-from copy import deepcopy
+from content_loader import load_content, ordered_keys
 
-def _deep_merge(dest: dict, src: dict):
-    for k, v in src.items():
-        if isinstance(v, dict) and isinstance(dest.get(k), dict):
-            _deep_merge(dest[k], v)
-        else:
-            dest[k] = deepcopy(v)
-    return dest
-
-
-def load_content(content_dir: str = "content") -> dict:
-    """Load all YAML files from /content and show a clear error (file + line) if one is invalid."""
-    config: dict = {}
-    if not os.path.isdir(content_dir):
-        return config
-    for fname in sorted(os.listdir(content_dir)):
-        if not fname.lower().endswith((".yml", ".yaml")):
-            continue
-        path = os.path.join(content_dir, fname)
-        try:
-            with open(path, "r", encoding="utf-8") as f:
-                data = yaml.safe_load(f) or {}
-        except Exception as e:
-            st.error(f"❌ YAML error in **{fname}**\n\n{type(e).__name__}: {e}")
-            st.stop()
-        _deep_merge(config, data)
-    return config
-
-
-def ordered_keys(d: dict, order_key: str = "_order") -> list:
-    if not isinstance(d, dict):
-        return []
-    explicit = d.get(order_key)
-    keys = [k for k in (explicit or d.keys()) if k != order_key and k in d]
-    if explicit:
-        keys += [k for k in d.keys() if k not in explicit and k != order_key]
-    return keys
-
-# ───────────────── Page config ─────────────────
+# =============== Page configuration ===============
 st.set_page_config(
     page_title="SkillNestEdu Course Engine",
     page_icon="📘",
@@ -56,16 +25,22 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# ───────────────── Teacher password (secrets/env) ─────────────────
+# =============== Utilities ===============
+
+def section_title(text: str):
+    st.markdown(f"### {text}")
+
 
 def _get_teacher_pass() -> str | None:
+    """Read teacher password from Streamlit secrets or env (TEACHER_PASS)."""
     try:
         val = st.secrets.get("TEACHER_PASS")
     except Exception:
         val = None
     return val or os.environ.get("TEACHER_PASS")
 
-# ───────────────── Diagrams ─────────────────
+
+# =============== Diagrams ===============
 
 def ppc_diagram():
     st.markdown("Use the slider to see shifts in production possibilities.")
@@ -98,11 +73,9 @@ def ppc_diagram():
     fig.update_layout(title="Production Possibility Curve (PPC)", xaxis_title="Good A", yaxis_title="Good B")
     st.plotly_chart(fig, use_container_width=True)
 
-    # Live metrics
     baseline = 5
-    x_intercept = np.sqrt(20 * slider)  # when B = 0
-    y_intercept = slider                 # when A = 0
-
+    x_intercept = np.sqrt(20 * slider)
+    y_intercept = slider
     c1, c2, c3 = st.columns(3)
     with c1:
         st.metric("Max Good A (x‑intercept)", f"{x_intercept:.1f}", delta=f"{x_intercept - np.sqrt(20*baseline):.1f}")
@@ -116,7 +89,6 @@ def ppc_diagram():
         else:
             st.info("Baseline frontier.")
 
-    # Opportunity cost coach
     st.markdown("**Opportunity Cost (choose a movement):**")
     move = st.radio("", ["B → C (gain A)", "A → B (gain B)"], horizontal=True, key="ppc_move")
     scale_label = st.radio("Units scale", ["per 1 unit", "per 10 units", "per 100 units"], horizontal=True, key="ppc_scale")
@@ -152,272 +124,206 @@ def elasticity_diagram():
     fig.update_layout(title="Elastic vs Inelastic Demand", xaxis_title="Price", yaxis_title="Quantity", legend=dict(x=0.7, y=0.95))
     st.plotly_chart(fig, use_container_width=True)
 
-# ───────────────── Render helpers ─────────────────
 
-def section_title(text: str):
-    st.markdown(f"### {text}")
+# =============== Render helpers ===============
 
-
-def render_objectives(objs: List[str], time_estimate: str | None):
-    cols = st.columns([3, 1])
-    with cols[0]:
-        section_title("Learning Objectives")
-        for o in objs or []:
-            st.markdown(f"- {o}")
-    with cols[1]:
-        if time_estimate:
-            st.caption(f"⏱️ {time_estimate}")
+def render_objectives(items: List[str], time_estimate: str | None):
+    section_title("Learning Objectives")
+    if time_estimate:
+        st.caption(f"⏱️ {time_estimate}")
+    for it in items or []:
+        st.markdown(f"- {it}")
 
 
 def render_prereq(items: List[str]):
     if not items:
+        st.info("No quick recap for this step.")
         return
-    with st.expander("Prerequisite Recap (2‑minute refresher)"):
+    with st.expander("Prerequisite Recap (2-minute refresher)", True):
         for it in items:
             st.markdown(f"- {it}")
 
 
-def render_explanation(points: List[str]):
-    section_title("Explanation")
-    for p in points or []:
-        st.markdown(f"- {p}")
+def render_explanation(lines: List[str]):
+    for ln in lines or []:
+        st.markdown(f"- {ln}")
+
+
+def render_textbook_pointers(items: List[str] | None):
+    if not items:
+        return
+    with st.expander("Textbook pointers", True):
+        for it in items:
+            st.markdown(f"- {it}")
 
 
 def render_worked_examples(examples: List[Dict[str, Any]]):
     if not examples:
         return
-    section_title("Worked Examples")
-    for i, ex in enumerate(examples, 1):
-        with st.expander(f"Example {i}: {ex.get('title','')}"):
-            if ex.get("steps"):
-                st.markdown("**Steps**")
-                for s in ex["steps"]:
-                    st.markdown(f"1. {s}")
+    for ex in examples:
+        with st.expander(f"Example: {ex.get('title','')}"):
+            for s in ex.get("steps", []):
+                st.markdown(f"- {s}")
             if ex.get("notes"):
-                st.markdown("**Why these steps?**")
+                st.caption("**Notes:**")
                 for n in ex["notes"]:
                     st.markdown(f"- {n}")
             if ex.get("solution"):
-                st.markdown("**Model Solution**")
-                st.markdown(ex["solution"])
+                st.success(ex["solution"])
 
 
 def render_misconceptions(items: List[str]):
     if not items:
         return
-    with st.expander("Common Mistakes"):
-        for m in items:
-            st.markdown(f"- {m}")
+    st.markdown("**Common misconceptions**")
+    for it in items:
+        st.markdown(f"- {it}")
 
 
-def render_command_terms(terms: List[Dict[str, str]]):
-    if not terms:
-        return
-    section_title("Command Terms")
-    for ct in terms:
-        st.markdown(f"- **{ct['term']}** — {ct['definition']}")
-        if ct.get("mini_frame"):
-            st.caption(f"Response frame: {ct['mini_frame']}")
-
-
-def render_tok(tok: str):
-    if tok:
-        section_title("TOK Insight")
-        st.markdown(tok, unsafe_allow_html=True)
-
-
-def render_short_questions(items: List[Dict[str, Any]], teacher_mode: bool):
+def render_command_terms(items: List[Dict[str, Any]]):
     if not items:
         return
-    section_title("Short Questions")
-    for i, q in enumerate(items, 1):
-        with st.expander(f"Q{i}. {q['question']}"):
-            for j, hint in enumerate(q.get("hint_chain", []), 1):
-                st.markdown(f"*Hint {j}:* {hint}")
+    with st.expander("Command terms"):
+        for x in items:
+            st.markdown(f"- **{x.get('term','')}** — {x.get('definition','')}")
+            if x.get("mini_frame"):
+                st.caption(x["mini_frame"])
+
+
+def render_glossary(items: Dict[str, str]):
+    if not items:
+        return
+    with st.expander("Glossary"):
+        for k, v in items.items():
+            st.markdown(f"- **{k}:** {v}")
+
+
+def render_tok(text: str):
+    if not text:
+        return
+    section_title("Theory of Knowledge (TOK)")
+    st.info(text)
+
+
+def render_mcqs(questions: List[Dict[str, Any]]):
+    if not questions:
+        return
+    score = 0
+    for i, q in enumerate(questions, 1):
+        st.markdown(f"**Q{i}. {q['question']}**")
+        choice = st.radio("", list(q["options"].keys()), key=f"mcq_{i}")
+        if choice == q["answer"]:
+            st.success("Correct!")
+            score += 1
+        else:
+            st.error(f"Incorrect. Correct answer: {q['answer']}")
+        if q.get("rationales"):
+            st.caption(q["rationales"][choice])
+    st.info(f"Score: {score}/{len(questions)}")
+
+
+def render_short_questions(qs: List[Dict[str, Any]], teacher_mode: bool):
+    if not qs:
+        return
+    for i, q in enumerate(qs, 1):
+        with st.expander(f"Short Question {i}"):
+            st.markdown(q["question"])
+            if q.get("hint_chain"):
+                with st.expander("Hints"):
+                    for h in q["hint_chain"]:
+                        st.markdown(f"- {h}")
+            st.text_area("Your answer", key=f"sq_{i}")
             if teacher_mode and q.get("model_answer"):
-                st.markdown("**Model Answer**")
-                st.markdown(q["model_answer"])
+                st.success(f"Model answer: {q['model_answer']}")
 
 
-def render_extended_questions(items: List[Dict[str, Any]], teacher_mode: bool):
-    if not items:
+def render_extended_questions(qs: List[Dict[str, Any]], teacher_mode: bool):
+    if not qs:
         return
-    section_title("Extended Response")
-    for i, q in enumerate(items, 1):
-        with st.expander(f"Q{i}. {q['question']}"):
+    for i, q in enumerate(qs, 1):
+        with st.expander(f"Extended Response {i}"):
+            st.markdown(q["question"])
             if q.get("planning_scaffold"):
-                st.markdown("**Planning Scaffold**")
-                for s in q["planning_scaffold"]:
-                    st.markdown(f"- {s}")
-            if q.get("criteria"):
-                st.caption(q["criteria"])
+                st.caption("Planning scaffold:")
+                for p in q["planning_scaffold"]:
+                    st.markdown(f"- {p}")
+            st.text_area("Outline / Answer", key=f"er_{i}")
             if teacher_mode and q.get("model_answer"):
-                st.markdown("**Model Answer**")
-                st.markdown(q["model_answer"])
-
-
-def render_mcqs(items: List[Dict[str, Any]], *, subject: str, topic: str, subtopic: str | None):
-    if not items:
-        return
-    section_title("MCQs (check your understanding)")
-    for i, mc in enumerate(items, 1):
-        key = f"mcq_{subject}_{topic}_{subtopic or 'Overview'}_{i}"
-        order = ["A", "B", "C", "D"]
-        labels = [f"{k}. {mc['options'][k]}" for k in order if k in mc["options"]]
-        choice_label = st.radio(mc["question"], labels, key=key)
-        if choice_label:
-            choice_key = choice_label.split(".")[0]
-            if choice_key == mc["answer"]:
-                st.success(f"Correct! {mc['rationales'][choice_key]}")
-            else:
-                st.error(f"Not quite. {mc['rationales'][choice_key]}")
-                st.info(f"✅ Correct answer: {mc['answer']}. {mc['rationales'][mc['answer']]}")
+                st.success(f"Model answer: {q['model_answer']}")
 
 
 def render_exit_ticket(items: List[str]):
     if not items:
         return
-    section_title("Exit Ticket")
-    for i, et in enumerate(items, 1):
-        st.markdown(f"{i}. {et}")
+    with st.expander("Exit Ticket"):
+        for it in items:
+            st.markdown(f"- {it}")
 
 
 def render_ia_ee(entry: Dict[str, Any]):
-    if not entry.get("ia_scaffold") and not entry.get("ee_scaffold"):
+    ia = entry.get("ia_scaffold") or []
+    ee = entry.get("ee_scaffold") or []
+    if not (ia or ee):
         return
-    section_title("IA/EE Scaffolding")
-    cols = st.columns(2)
-    with cols[0]:
-        st.markdown("**IA Scaffold**")
-        ia = entry.get("ia_scaffold")
-        if isinstance(ia, list):
+    with st.expander("IA / EE Scaffolding"):
+        if ia:
+            st.markdown("**IA ideas**")
             for it in ia:
                 st.markdown(f"- {it}")
-        elif ia:
-            st.markdown(ia)
-    with cols[1]:
-        st.markdown("**EE Scaffold**")
-        ee = entry.get("ee_scaffold")
-        if isinstance(ee, list):
+        if ee:
+            st.markdown("**EE ideas**")
             for it in ee:
                 st.markdown(f"- {it}")
-        elif ee:
-            st.markdown(ee)
 
 
 def render_teacher_notes(notes: Dict[str, Any]):
     if not notes:
+        st.info("No additional teacher notes for this section.")
         return
-    section_title("Teacher's Notes")
-    tps = notes.get("talking_points", [])
-    sas = notes.get("sample_answers", [])
-    if tps:
-        st.markdown("**Talking Points**")
-        for tp in tps:
-            st.markdown(f"- {tp}")
-    if sas:
-        st.markdown("**Sample Answers**")
-        for sa in sas:
-            st.markdown(f"- {sa}")
+    with st.expander("Detailed teacher notes"):
+        for k in ["talking_points", "sample_answers"]:
+            if notes.get(k):
+                st.markdown(f"**{k.replace('_',' ').title()}**")
+                for it in notes[k]:
+                    st.markdown(f"- {it}")
 
+
+# =============== Teacher sidebar (per subtopic) ===============
 
 def render_teacher_panel(entry: Dict[str, Any]):
-    """Compact teacher-only dashboard shown in the sidebar."""
-    notes = entry.get("teacher_notes", {}) or {}
-    st.markdown("### 👩‍🏫 Teacher Panel")
-
-    # Lecture plan / pacing
-    if notes.get("lecture_script") or notes.get("pacing"):
-        st.markdown("**Lecture plan & pacing**")
-        for b in notes.get("lecture_script", []):
-            st.markdown(f"- {b}")
-        if notes.get("pacing"):
-            st.caption(f"⏱️ Pacing: {notes['pacing']}")
-
-    # Socratic prompts
-    if notes.get("socratic_prompts"):
-        st.markdown("**Socratic prompts**")
-        for q in notes["socratic_prompts"]:
-            st.markdown(f"- {q}")
-
-    # Misconceptions (from entry)
-    if entry.get("misconceptions"):
-        st.markdown("**Common misconceptions**")
-        for m in entry["misconceptions"]:
-            st.markdown(f"- {m}")
-
-    # Board / slide plan
-    if notes.get("board_plan"):
-        st.markdown("**Board/Slide plan**")
-        for b in notes["board_plan"]:
-            st.markdown(f"- {b}")
-
-    # Live checks
-    if notes.get("live_checks"):
-        st.markdown("**Live checks (CFU)**")
-        for c in notes["live_checks"]:
-            st.markdown(f"- {c}")
-
-    # Textbook pointers
-    if entry.get("textbook_pointers"):
-        st.markdown("**Textbook pointers (Tragakes)**")
-        tps = entry["textbook_pointers"]
-        for it in (tps if isinstance(tps, list) else [tps]):
-            st.markdown(f"- {it}")
-
-    # Model answers quick access
-    if notes.get("sample_answers"):
-        with st.expander("Model answers (quick)"):
-            for sa in notes["sample_answers"]:
-                st.markdown(f"- {sa}")
+    with st.sidebar:
+        st.markdown("### 🧑‍🏫 Teacher Panel")
+        tn = entry.get("teacher_notes", {})
+        if tn.get("pacing"):
+            st.caption(f"⏱️ {tn['pacing']}")
+        if tn.get("lecture_script"):
+            with st.expander("Lecture script", True):
+                for x in tn["lecture_script"]:
+                    st.markdown(f"- {x}")
+        if tn.get("socratic_prompts"):
+            with st.expander("Socratic prompts"):
+                for x in tn["socratic_prompts"]:
+                    st.markdown(f"- {x}")
+        if tn.get("board_plan"):
+            with st.expander("Board plan"):
+                for x in tn["board_plan"]:
+                    st.markdown(f"- {x}")
+        if tn.get("live_checks"):
+            with st.expander("Live checks"):
+                for x in tn["live_checks"]:
+                    st.markdown(f"- {x}")
+        # Helpful always
+        if entry.get("textbook_pointers"):
+            with st.expander("Textbook pointers"):
+                for x in entry["textbook_pointers"]:
+                    st.markdown(f"- {x}")
+        if entry.get("misconceptions"):
+            with st.expander("Common misconceptions"):
+                for x in entry["misconceptions"]:
+                    st.markdown(f"- {x}")
 
 
-def render_visuals(items: List[Any]):
-    if not items:
-        return
-    section_title("Visuals")
-    n = min(3, len(items))
-    cols = st.columns(n)
-    for i, itm in enumerate(items):
-        with cols[i % n]:
-            src, cap = None, ""
-            if isinstance(itm, dict):
-                src = itm.get("src") or itm.get("url")
-                cap = itm.get("caption", "")
-            elif isinstance(itm, str):
-                src = itm
-            if not src:
-                continue
-            lower = src.lower()
-            if lower.endswith((".png", ".jpg", ".jpeg", ".webp", ".gif")):
-                st.image(src, caption=cap, use_column_width=True)
-            elif lower.endswith(".svg"):
-                st.markdown(f'<img src="{src}" style="max-width:100%; height:auto;"/>', unsafe_allow_html=True)
-                if cap:
-                    st.caption(cap)
-            else:
-                st.warning(f"Unsupported visual format: {src}. Use PNG/JPG/SVG.")
-
-
-def render_textbook_pointers(ptrs):
-    if not ptrs:
-        return
-    section_title("Textbook pointers (Tragakes 3rd ed.)")
-    if isinstance(ptrs, list):
-        for it in ptrs:
-            st.markdown(f"- {it}")
-    else:
-        st.markdown(f"- {ptrs}")
-
-
-def render_glossary(gloss: Dict[str, str]):
-    if not gloss:
-        return
-    section_title("Glossary")
-    for term, definition in gloss.items():
-        with st.expander(term):
-            st.markdown(definition)
-
+# =============== Learn Mode orchestrator ===============
 
 def render_diagram_step(entry: Dict[str, Any]):
     func_name = entry.get("diagram")
@@ -433,83 +339,64 @@ def render_diagram_step(entry: Dict[str, Any]):
         if entry.get("alt_text"):
             st.caption(f"Alt-text: {entry['alt_text']}")
 
-# ───────────────── Learn Mode ─────────────────
 
 def learn_mode(CONFIG: dict, subject: str, level: str, topic: str, subtopic: str | None, teacher_mode: bool = False):
     entry = CONFIG[subject][topic][subtopic or "Overview"]
     st.markdown(f"## 📘 {level} - {topic}{': ' + subtopic if subtopic else ''}")
 
-    # Build the step list cleanly (no duplicates). Include a step only if it has content.
-    steps: List[tuple[str, callable]] = []
+    # Show teacher sidebar per subtopic
+    if teacher_mode:
+        render_teacher_panel(entry)
 
-    steps.append(("Objectives", lambda: render_objectives(entry.get("learning_objectives", []), entry.get("time_estimate"))))
-    if entry.get("prereq_recap"):
-        steps.append(("Recap", lambda: render_prereq(entry.get("prereq_recap", []))))
-    if entry.get("explanation"):
-        steps.append(("Explain", lambda: render_explanation(entry.get("explanation", []))))
-    if entry.get("textbook_pointers"):
-        steps.append(("Textbook pointers", lambda: render_textbook_pointers(entry.get("textbook_pointers"))))
-    if entry.get("visuals"):
-        steps.append(("Visuals", lambda: render_visuals(entry.get("visuals"))))
-    if entry.get("diagram"):
-        steps.append(("Interactive Diagram", lambda: render_diagram_step(entry)))
-    if entry.get("worked_examples"):
-        steps.append(("Examples", lambda: render_worked_examples(entry.get("worked_examples", []))))
-    if entry.get("misconceptions"):
-        steps.append(("Misconceptions", lambda: render_misconceptions(entry.get("misconceptions", []))))
-    if entry.get("command_terms"):
-        steps.append(("Command Terms", lambda: render_command_terms(entry.get("command_terms", []))))
-    if entry.get("glossary"):
-        steps.append(("Glossary", lambda: render_glossary(entry.get("glossary", {}))))
-    if entry.get("tok_insight"):
-        steps.append(("TOK", lambda: render_tok(entry.get("tok_insight", ""))))
-    if entry.get("mcqs"):
-        steps.append(("Practice (MCQ)", lambda: render_mcqs(entry.get("mcqs", []), subject=subject, topic=topic, subtopic=subtopic)))
-    if entry.get("short_questions"):
-        steps.append(("Short Questions", lambda: render_short_questions(entry.get("short_questions", []), teacher_mode)))
-    if entry.get("extended_questions"):
-        steps.append(("Extended", lambda: render_extended_questions(entry.get("extended_questions", []), teacher_mode)))
-    if entry.get("exit_ticket"):
-        steps.append(("Exit Ticket", lambda: render_exit_ticket(entry.get("exit_ticket", []))))
-    if entry.get("ia_scaffold") or entry.get("ee_scaffold"):
-        steps.append(("IA/EE", lambda: render_ia_ee(entry)))
-    if teacher_mode and entry.get("teacher_notes"):
-        steps.append(("Teacher Notes", lambda: render_teacher_notes(entry.get("teacher_notes", {}))))
+    # Steps (auto-hide if no content)
+    steps: List[Tuple[str, Any]] = [
+        ("Objectives", lambda: render_objectives(entry.get("learning_objectives", []), entry.get("time_estimate"))),
+        entry.get("prereq_recap") and ("Recap", lambda: render_prereq(entry.get("prereq_recap", []))),
+        ("Explain", lambda: render_explanation(entry.get("explanation", []))),
+        entry.get("textbook_pointers") and ("Textbook pointers", lambda: render_textbook_pointers(entry.get("textbook_pointers"))),
+        entry.get("diagram") and ("Interactive Diagram", lambda: render_diagram_step(entry)),
+        entry.get("worked_examples") and ("Examples", lambda: render_worked_examples(entry.get("worked_examples", []))),
+        entry.get("misconceptions") and ("Misconceptions", lambda: render_misconceptions(entry.get("misconceptions", []))),
+        entry.get("command_terms") and ("Command Terms", lambda: render_command_terms(entry.get("command_terms", []))),
+        entry.get("glossary") and ("Glossary", lambda: render_glossary(entry.get("glossary", {}))),
+        entry.get("tok_insight") and ("TOK", lambda: render_tok(entry.get("tok_insight", ""))),
+        entry.get("mcqs") and ("Practice (MCQ)", lambda: render_mcqs(entry.get("mcqs", []))),
+        entry.get("short_questions") and ("Short Questions", lambda: render_short_questions(entry.get("short_questions", []), teacher_mode)),
+        entry.get("extended_questions") and ("Extended", lambda: render_extended_questions(entry.get("extended_questions", []), teacher_mode)),
+        entry.get("exit_ticket") and ("Exit Ticket", lambda: render_exit_ticket(entry.get("exit_ticket", []))),
+        (entry.get("ia_scaffold") or entry.get("ee_scaffold")) and ("IA/EE", lambda: render_ia_ee(entry)),
+        teacher_mode and ("Teacher Notes", lambda: render_teacher_notes(entry.get("teacher_notes", {}))),
+    ]
+    steps = [s for s in steps if s]
 
-    # Navigation state
     key = f"step_{subject}_{topic}_{subtopic or 'Overview'}"
     if key not in st.session_state:
         st.session_state[key] = 0
     idx = st.session_state[key]
-    idx = max(0, min(idx, len(steps) - 1))
 
-    # Progress + render
-    if steps:
-        st.progress((idx + 1) / len(steps))
-        st.caption(f"Step {idx + 1} of {len(steps)} — {steps[idx][0]}")
-        steps[idx][1]()
-    else:
-        st.info("No content for this subtopic yet.")
+    st.progress((idx + 1) / max(1, len(steps)))
+    st.caption(f"Step {idx + 1} of {len(steps)} — {steps[idx][0]}")
+    steps[idx][1]()
 
-    # Nav buttons
     col_prev, col_next = st.columns(2)
     with col_prev:
         if st.button("⬅️ Back", key=f"back_{key}_{idx}", disabled=idx == 0):
             st.session_state[key] = max(0, idx - 1)
             st.rerun()
     with col_next:
-        if st.button("Next ➡️", key=f"next_{key}_{idx}", disabled=idx >= len(steps) - 1):
+        if st.button("Next ➡️", key=f"next_{key}_{idx}", disabled=idx == len(steps) - 1):
             st.session_state[key] = min(len(steps) - 1, idx + 1)
             st.rerun()
 
-# ───────────────── UI ─────────────────
+
+# =============== UI ===============
 
 st.title("📘 SkillNestEdu Course Engine")
 st.subheader("Your AI-powered self-study lesson builder")
 
 CONFIG = load_content("content")
 if not CONFIG:
-    st.error("No content found. Create the /content folder with YAML files.")
+    st.error("No content found. Create the /content folder with YAML files as in the Split Pack.")
 else:
     subjects = ordered_keys(CONFIG)
     subject = st.selectbox("Choose Subject", subjects)
@@ -541,24 +428,12 @@ else:
     else:
         st.session_state["teacher_ok"] = False
 
-    # Start / Resume Learn Mode (reset when dropdowns change)
-    selection_signature = f"{subject}|{topic}|{sub or 'Overview'}"
-    if st.session_state.get("active_signature") and st.session_state["active_signature"] != selection_signature:
-        st.session_state["learn_active"] = False
-        st.session_state["active_signature"] = selection_signature
-
-    # 👩‍🏫 Sidebar teacher panel (visible only to teachers)
-    if teacher_mode:
-        entry_preview = CONFIG[subject][topic][sub or "Overview"]
-        with st.sidebar:
-            render_teacher_panel(entry_preview)
-
     start_clicked = st.button("Start Learn Mode ▶️", key="start_learn")
+    signature = f"{subject}|{topic}|{sub or 'Overview'}"
     if start_clicked:
         st.session_state["learn_active"] = True
-        st.session_state["active_signature"] = selection_signature
+        st.session_state["active_signature"] = signature
         st.session_state[f"step_{subject}_{topic}_{sub or 'Overview'}"] = 0
 
-    if st.session_state.get("learn_active") and st.session_state.get("active_signature") == selection_signature:
+    if st.session_state.get("learn_active") and st.session_state.get("active_signature") == signature:
         learn_mode(CONFIG, subject, level, topic, sub, teacher_mode)
-
