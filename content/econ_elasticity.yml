@@ -1,0 +1,71 @@
+Economics:
+  Elasticity:
+    _order: ["Overview", "Price Elasticity Interactive"]
+
+    Overview:
+      time_estimate: "45 minutes"
+      learning_objectives:
+        - "Define PED and interpret values relative to 1."
+        - "Explain the total revenue test."
+      explanation:
+        - "PED = %ΔQd / %ΔP; magnitude indicates responsiveness."
+        - "Elastic (>1), inelastic (<1), unit (=1)."
+        - "TR test: in elastic range, P↓ → TR↑; in inelastic, P↓ → TR↓."
+      short_questions:
+        - question: "State two determinants of PED."
+          hint_chain: ["Think substitutes and time."]
+          model_answer: "Availability of substitutes, proportion of income, necessity vs luxury, time period."
+
+    Price Elasticity Interactive:
+      time_estimate: "50 minutes"
+      diagram: elasticity_diagram
+      alt_text: "Two demand curves: steep (inelastic) and flat (elastic)."
+      learning_objectives:
+        - "Compute PED using midpoint formula."
+        - "Relate elasticity to revenue outcomes."
+      prereq_recap:
+        - "Percentage change calculations."
+        - "Reading demand curves."
+      explanation:
+        - "Elastic vs inelastic curves (visual intuition)."
+        - "Slope ≠ elasticity; use point P/Q context."
+      worked_examples:
+        - title: "Compute PED using midpoint method"
+          steps:
+            - "Initial P=10, Q=100 → New P=12, Q=90."
+            - "Compute %ΔP and %ΔQ using midpoint formula."
+            - "Calculate PED and interpret."
+          notes:
+            - "Midpoint avoids base effects."
+          solution: "%ΔP=(12-10)/((12+10)/2)=2/11≈18.18%; %ΔQ=(90-100)/95=−10.53%; PED≈0.58 (inelastic)."
+      misconceptions:
+        - "Elasticity equals slope (it does not)."
+      command_terms:
+        - term: Calculate
+          definition: "Obtain a numerical answer showing steps."
+          mini_frame: "State formula → Substitute → Compute → Interpret."
+      mcqs:
+        - question: "PED is defined as …"
+          options: {A: "%ΔP/%ΔQd", B: "%ΔQd/%ΔP", C: "%ΔQd×%ΔP", D: "%ΔP−%ΔQd"}
+          answer: B
+          rationales: {A: "Inverse of PED.", B: "Correct.", C: "Not a ratio.", D: "Not a definition."}
+        - question: "Demand is unit elastic when …"
+          options: {A: "PED=0", B: "PED=1", C: "PED>1", D: "PED<1"}
+          answer: B
+          rationales: {A: "Perfectly inelastic.", B: "Correct.", C: "Elastic.", D: "Inelastic."}
+        - question: "If price rises and TR falls, demand is …"
+          options: {A: "elastic", B: "inelastic", C: "unit elastic", D: "perfectly inelastic"}
+          answer: A
+          rationales: {A: "Correct: TR moves opposite price.", B: "TR would rise.", C: "TR unchanged.", D: "TR rises with price."}
+        - question: "Which increases PED?"
+          options: {A: "Fewer substitutes", B: "Shorter time horizon", C: "Luxury nature", D: "Smaller income share"}
+          answer: C
+          rationales: {A: "Decreases PED.", B: "Less time to adjust → lower PED.", C: "Correct.", D: "Lower sensitivity."}
+        - question: "A steeper demand curve at a point implies …"
+          options: {A: "always lower PED", B: "always higher PED", C: "nothing—slope ≠ elasticity", D: "PED=1"}
+          answer: C
+          rationales: {A: "Depends on P/Q.", B: "Same issue.", C: "Correct.", D: "Not implied."}
+        - question: "TR is maximized when …"
+          options: {A: "price is highest", B: "PED=1", C: "PED>1", D: "PED<1"}
+          answer: B
+          rationales: {A: "Not necessarily.", B: "Correct: unit elasticity.", C: "TR rises when price falls.", D: "TR rises when price rises."}
