@@ -206,13 +206,19 @@ if teacher_toggle:
 else:
     st.session_state["teacher_ok"] = False
 
-# Start Learn Mode
+# Start / Resume Learn Mode
+selection_signature = f"{subject}|{topic}|{sub or 'Overview'}"
+
+# If the user changes Subject/Topic/Subtopic, reset learn mode state
+if st.session_state.get("active_signature") and st.session_state["active_signature"] != selection_signature:
+    st.session_state["learn_active"] = False
+    st.session_state["active_signature"] = selection_signature
+
 start_clicked = st.button("Start Learn Mode ▶️", key="start_learn")
-signature = f"{subject}|{topic}|{subtopic or 'Overview'}"
 if start_clicked:
     st.session_state["learn_active"] = True
-    st.session_state["active_signature"] = signature
-    st.session_state[f"step_{subject}_{topic}_{subtopic or 'Overview'}"] = 0
+    st.session_state["active_signature"] = selection_signature
+    st.session_state[f"step_{subject}_{topic}_{sub or 'Overview'}"] = 0
 
-if st.session_state.get("learn_active") and st.session_state.get("active_signature") == signature:
+if st.session_state.get("learn_active") and st.session_state.get("active_signature") == selection_signature:
     learn_mode(subject, level, topic, sub, teacher_mode)
