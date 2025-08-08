@@ -1,16 +1,51 @@
+from __future__ import annotations
+
 import os
-import json
 from typing import Dict, Any, List
 
 import streamlit as st
 import plotly.graph_objects as go
 import numpy as np
-from google.oauth2 import service_account
-from googleapiclient.discovery import build
 
-from content_loader import load_content, ordered_keys
+# Load split YAML content
+try:
+    from content_loader import load_content, ordered_keys
+except Exception:
+    # Fallback inline loader (works if content_loader.py missing)
+    import yaml
+    from copy import deepcopy
 
-# =============== Page configuration ===============
+    def _deep_merge(dest: dict, src: dict):
+        for k, v in src.items():
+            if isinstance(v, dict) and isinstance(dest.get(k), dict):
+                _deep_merge(dest[k], v)
+            else:
+                dest[k] = deepcopy(v)
+        return dest
+
+    def load_content(content_dir: str = "content") -> dict:
+        config: dict = {}
+        if not os.path.isdir(content_dir):
+            return config
+        for fname in sorted(os.listdir(content_dir)):
+            if not fname.lower().endswith((".yml", ".yaml")):
+                continue
+            path = os.path.join(content_dir, fname)
+            with open(path, "r", encoding="utf-8") as f:
+                data = yaml.safe_load(f) or {}
+            _deep_merge(config, data)
+        return config
+
+    def ordered_keys(d: dict, order_key: str = "_order") -> list:
+        if not isinstance(d, dict):
+            return []
+        explicit = d.get(order_key)
+        keys = [k for k in (explicit or d.keys()) if k != order_key and k in d]
+        if explicit:
+            keys += [k for k in d.keys() if k not in explicit and k != order_key]
+        return keys
+
+# ───────────────── Page config ─────────────────
 st.set_page_config(
     page_title="SkillNestEdu Course Engine",
     page_icon="📘",
@@ -18,25 +53,16 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# =============== Google auth (env/secret-based) ===============
-SCOPES = [
-    "https://www.googleapis.com/auth/documents.readonly",
-]
+# ───────────────── Teacher password (secrets/env) ─────────────────
 
+def _get_teacher_pass() -> str | None:
+    try:
+        val = st.secrets.get("TEACHER_PASS")
+    except Exception:
+        val = None
+    return val or os.environ.get("TEACHER_PASS")
 
-def _get_google_creds():
-    raw = None
-    if "GOOGLE_SERVICE_ACCOUNT" in st.secrets:
-        raw = st.secrets["GOOGLE_SERVICE_ACCOUNT"]
-    elif os.environ.get("GOOGLE_SERVICE_ACCOUNT"):
-        raw = os.environ["GOOGLE_SERVICE_ACCOUNT"]
-    else:
-        raise RuntimeError("GOOGLE_SERVICE_ACCOUNT secret not set in Streamlit secrets or env.")
-    info = raw if isinstance(raw, dict) else json.loads(raw)
-    return service_account.Credentials.from_service_account_info(info, scopes=SCOPES)
-
-
-# =============== Diagram functions ===============
+# ───────────────── Diagrams ─────────────────
 
 def ppc_diagram():
     st.markdown("Use the slider to see shifts in production possibilities.")
@@ -69,9 +95,11 @@ def ppc_diagram():
     fig.update_layout(title="Production Possibility Curve (PPC)", xaxis_title="Good A", yaxis_title="Good B")
     st.plotly_chart(fig, use_container_width=True)
 
+    # Live metrics
     baseline = 5
-    x_intercept = np.sqrt(20 * slider)
-    y_intercept = slider
+    x_intercept = np.sqrt(20 * slider)  # when B = 0
+    y_intercept = slider                 # when A = 0
+
     c1, c2, c3 = st.columns(3)
     with c1:
         st.metric("Max Good A (x‑intercept)", f"{x_intercept:.1f}", delta=f"{x_intercept - np.sqrt(20*baseline):.1f}")
@@ -85,6 +113,7 @@ def ppc_diagram():
         else:
             st.info("Baseline frontier.")
 
+    # Opportunity cost coach
     st.markdown("**Opportunity Cost (choose a movement):**")
     move = st.radio("", ["B → C (gain A)", "A → B (gain B)"], horizontal=True, key="ppc_move")
     scale_label = st.radio("Units scale", ["per 1 unit", "per 10 units", "per 100 units"], horizontal=True, key="ppc_scale")
@@ -120,47 +149,243 @@ def elasticity_diagram():
     fig.update_layout(title="Elastic vs Inelastic Demand", xaxis_title="Price", yaxis_title="Quantity", legend=dict(x=0.7, y=0.95))
     st.plotly_chart(fig, use_container_width=True)
 
+# ───────────────── Render helpers ─────────────────
 
-# =============== Learn Mode orchestrator ===============
-def learn_mode(subject: str, level: str, topic: str, subtopic: str | None, teacher_mode: bool = False):
+def section_title(text: str):
+    st.markdown(f"### {text}")
+
+
+def render_objectives(objs: List[str], time_estimate: str | None):
+    cols = st.columns([3, 1])
+    with cols[0]:
+        section_title("Learning Objectives")
+        for o in objs or []:
+            st.markdown(f"- {o}")
+    with cols[1]:
+        if time_estimate:
+            st.caption(f"⏱️ {time_estimate}")
+
+
+def render_prereq(items: List[str]):
+    if not items:
+        return
+    with st.expander("Prerequisite Recap (2‑minute refresher)"):
+        for it in items:
+            st.markdown(f"- {it}")
+
+
+def render_explanation(points: List[str]):
+    section_title("Explanation")
+    for p in points or []:
+        st.markdown(f"- {p}")
+
+
+def render_worked_examples(examples: List[Dict[str, Any]]):
+    if not examples:
+        return
+    section_title("Worked Examples")
+    for i, ex in enumerate(examples, 1):
+        with st.expander(f"Example {i}: {ex.get('title','')}"):
+            if ex.get("steps"):
+                st.markdown("**Steps**")
+                for s in ex["steps"]:
+                    st.markdown(f"1. {s}")
+            if ex.get("notes"):
+                st.markdown("**Why these steps?**")
+                for n in ex["notes"]:
+                    st.markdown(f"- {n}")
+            if ex.get("solution"):
+                st.markdown("**Model Solution**")
+                st.markdown(ex["solution"])
+
+
+def render_misconceptions(items: List[str]):
+    if not items:
+        return
+    with st.expander("Common Mistakes"):
+        for m in items:
+            st.markdown(f"- {m}")
+
+
+def render_command_terms(terms: List[Dict[str, str]]):
+    if not terms:
+        return
+    section_title("Command Terms")
+    for ct in terms:
+        st.markdown(f"- **{ct['term']}** — {ct['definition']}")
+        if ct.get("mini_frame"):
+            st.caption(f"Response frame: {ct['mini_frame']}")
+
+
+def render_tok(tok: str):
+    if tok:
+        section_title("TOK Insight")
+        st.markdown(tok, unsafe_allow_html=True)
+
+
+def render_short_questions(items: List[Dict[str, Any]], teacher_mode: bool):
+    if not items:
+        return
+    section_title("Short Questions")
+    for i, q in enumerate(items, 1):
+        with st.expander(f"Q{i}. {q['question']}"):
+            for j, hint in enumerate(q.get("hint_chain", []), 1):
+                st.markdown(f"*Hint {j}:* {hint}")
+            if teacher_mode and q.get("model_answer"):
+                st.markdown("**Model Answer**")
+                st.markdown(q["model_answer"])
+
+
+def render_extended_questions(items: List[Dict[str, Any]], teacher_mode: bool):
+    if not items:
+        return
+    section_title("Extended Response")
+    for i, q in enumerate(items, 1):
+        with st.expander(f"Q{i}. {q['question']}"):
+            if q.get("planning_scaffold"):
+                st.markdown("**Planning Scaffold**")
+                for s in q["planning_scaffold"]:
+                    st.markdown(f"- {s}")
+            if q.get("criteria"):
+                st.caption(q["criteria"])
+            if teacher_mode and q.get("model_answer"):
+                st.markdown("**Model Answer**")
+                st.markdown(q["model_answer"])
+
+
+def render_mcqs(items: List[Dict[str, Any]], *, subject: str, topic: str, subtopic: str | None):
+    if not items:
+        return
+    section_title("MCQs (check your understanding)")
+    for i, mc in enumerate(items, 1):
+        key = f"mcq_{subject}_{topic}_{subtopic or 'Overview'}_{i}"
+        order = ["A", "B", "C", "D"]
+        labels = [f"{k}. {mc['options'][k]}" for k in order if k in mc["options"]]
+        choice_label = st.radio(mc["question"], labels, key=key)
+        if choice_label:
+            choice_key = choice_label.split(".")[0]
+            if choice_key == mc["answer"]:
+                st.success(f"Correct! {mc['rationales'][choice_key]}")
+            else:
+                st.error(f"Not quite. {mc['rationales'][choice_key]}")
+                st.info(f"✅ Correct answer: {mc['answer']}. {mc['rationales'][mc['answer']]}")
+
+
+def render_exit_ticket(items: List[str]):
+    if not items:
+        return
+    section_title("Exit Ticket")
+    for i, et in enumerate(items, 1):
+        st.markdown(f"{i}. {et}")
+
+
+def render_ia_ee(entry: Dict[str, Any]):
+    if not entry.get("ia_scaffold") and not entry.get("ee_scaffold"):
+        return
+    section_title("IA/EE Scaffolding")
+    cols = st.columns(2)
+    with cols[0]:
+        st.markdown("**IA Scaffold**")
+        ia = entry.get("ia_scaffold")
+        if isinstance(ia, list):
+            for it in ia:
+                st.markdown(f"- {it}")
+        elif ia:
+            st.markdown(ia)
+    with cols[1]:
+        st.markdown("**EE Scaffold**")
+        ee = entry.get("ee_scaffold")
+        if isinstance(ee, list):
+            for it in ee:
+                st.markdown(f"- {it}")
+        elif ee:
+            st.markdown(ee)
+
+
+def render_teacher_notes(notes: Dict[str, Any]):
+    if not notes:
+        return
+    section_title("Teacher's Notes")
+    tps = notes.get("talking_points", [])
+    sas = notes.get("sample_answers", [])
+    if tps:
+        st.markdown("**Talking Points**")
+        for tp in tps:
+            st.markdown(f"- {tp}")
+    if sas:
+        st.markdown("**Sample Answers**")
+        for sa in sas:
+            st.markdown(f"- {sa}")
+
+
+def render_textbook_pointers(ptrs):
+    if not ptrs:
+        return
+    section_title("Textbook pointers (Tragakes 3rd ed.)")
+    if isinstance(ptrs, list):
+        for it in ptrs:
+            st.markdown(f"- {it}")
+    else:
+        st.markdown(f"- {ptrs}")
+
+
+def render_glossary(gloss: Dict[str, str]):
+    if not gloss:
+        return
+    section_title("Glossary")
+    for term, definition in gloss.items():
+        with st.expander(term):
+            st.markdown(definition)
+
+
+def render_diagram_step(entry: Dict[str, Any]):
+    func_name = entry.get("diagram")
+    if not func_name:
+        return
+    section_title("Interactive Diagram")
+    pre = entry.get("diagram_preamble") or (entry.get("explanation") or [None])[0]
+    if pre:
+        st.info(pre)
+    func = globals().get(func_name)
+    if callable(func):
+        func()
+        if entry.get("alt_text"):
+            st.caption(f"Alt-text: {entry['alt_text']}")
+
+# ───────────────── Learn Mode ─────────────────
+
+def learn_mode(CONFIG: dict, subject: str, level: str, topic: str, subtopic: str | None, teacher_mode: bool = False):
     entry = CONFIG[subject][topic][subtopic or "Overview"]
-
-    # Header
     st.markdown(f"## 📘 {level} - {topic}{': ' + subtopic if subtopic else ''}")
 
-    # Step flow (diagram is inserted after Explanation)
     steps = [
         ("Objectives", lambda: render_objectives(entry.get("learning_objectives", []), entry.get("time_estimate"))),
         ("Recap", lambda: render_prereq(entry.get("prereq_recap", []))),
         ("Explain", lambda: render_explanation(entry.get("explanation", []))),
         ("Textbook pointers", lambda: render_textbook_pointers(entry.get("textbook_pointers"))),
+        ("Interactive Diagram", lambda: render_diagram_step(entry)),
         ("Examples", lambda: render_worked_examples(entry.get("worked_examples", []))),
         ("Misconceptions", lambda: render_misconceptions(entry.get("misconceptions", []))),
         ("Command Terms", lambda: render_command_terms(entry.get("command_terms", []))),
         ("Glossary", lambda: render_glossary(entry.get("glossary", {}))),
         ("TOK", lambda: render_tok(entry.get("tok_insight", ""))),
-        ("Practice (MCQ)", lambda: render_mcqs(entry.get("mcqs", []))),
+        ("Practice (MCQ)", lambda: render_mcqs(entry.get("mcqs", []), subject=subject, topic=topic, subtopic=subtopic)),
         ("Short Questions", lambda: render_short_questions(entry.get("short_questions", []), teacher_mode)),
         ("Extended", lambda: render_extended_questions(entry.get("extended_questions", []), teacher_mode)),
         ("Exit Ticket", lambda: render_exit_ticket(entry.get("exit_ticket", []))),
         ("IA/EE", lambda: render_ia_ee(entry)),
         ("Teacher Notes", lambda: render_teacher_notes(entry.get("teacher_notes", {})) if teacher_mode else None),
     ]
-    # Insert diagram after the Explanation step (index 3)
-    steps.insert(3, ("Interactive Diagram", lambda: render_diagram_step(entry)))
 
-    # Session state for step navigation
     key = f"step_{subject}_{topic}_{subtopic or 'Overview'}"
     if key not in st.session_state:
         st.session_state[key] = 0
     idx = st.session_state[key]
 
-    # Progress + render current step
     st.progress((idx + 1) / max(1, len(steps)))
     st.caption(f"Step {idx + 1} of {len(steps)} — {steps[idx][0]}")
     steps[idx][1]()
 
-    # Nav buttons
     col_prev, col_next = st.columns(2)
     with col_prev:
         if st.button("⬅️ Back", key=f"back_{key}_{idx}", disabled=idx == 0):
@@ -171,54 +396,56 @@ def learn_mode(subject: str, level: str, topic: str, subtopic: str | None, teach
             st.session_state[key] = min(len(steps) - 1, idx + 1)
             st.rerun()
 
+# ───────────────── UI ─────────────────
 
-# =============== UI ===============
 st.title("📘 SkillNestEdu Course Engine")
 st.subheader("Your AI-powered self-study lesson builder")
 
-subjects = list(CONFIG.keys())
-subject = st.selectbox("Choose Subject", subjects)
-level = st.selectbox("Choose IB Level", ["IB1", "IB2"])
-
-topics = list(CONFIG[subject].keys())
-topic = st.selectbox("Choose a Topic", topics)
-
-subs = list(CONFIG[subject][topic].keys())
-subtopic = st.selectbox("Choose Subtopic", [s for s in subs])
-sub = None if subtopic == "Overview" else subtopic
-
-# 🔒 Password-gated Teacher View
-teacher_toggle = st.checkbox("🔒 Teacher View (password required)")
-teacher_mode = False
-if teacher_toggle:
-    if not st.session_state.get("teacher_ok", False):
-        pw = st.text_input("Enter teacher password", type="password", key="teacher_pw")
-        if st.button("Unlock", type="primary"):
-            expected = _get_teacher_pass()
-            if not expected:
-                st.warning("Teacher password is not set. Ask admin to set TEACHER_PASS in Streamlit Secrets.")
-            elif pw == expected:
-                st.session_state["teacher_ok"] = True
-                st.success("Teacher View unlocked for this session.")
-            else:
-                st.error("Incorrect password.")
-    teacher_mode = st.session_state.get("teacher_ok", False)
+CONFIG = load_content("content")
+if not CONFIG:
+    st.error("No content found. Create the /content folder with YAML files.")
 else:
-    st.session_state["teacher_ok"] = False
+    subjects = ordered_keys(CONFIG)
+    subject = st.selectbox("Choose Subject", subjects)
+    level = st.selectbox("Choose IB Level", ["IB1", "IB2"])
 
-# Start / Resume Learn Mode
-selection_signature = f"{subject}|{topic}|{sub or 'Overview'}"
+    topics = ordered_keys(CONFIG[subject])
+    topic = st.selectbox("Choose a Topic", topics)
 
-# If the user changes Subject/Topic/Subtopic, reset learn mode state
-if st.session_state.get("active_signature") and st.session_state["active_signature"] != selection_signature:
-    st.session_state["learn_active"] = False
-    st.session_state["active_signature"] = selection_signature
+    subs = ordered_keys(CONFIG[subject][topic])
+    subtopic = st.selectbox("Choose Subtopic", [s for s in subs])
+    sub = None if subtopic == "Overview" else subtopic
 
-start_clicked = st.button("Start Learn Mode ▶️", key="start_learn")
-if start_clicked:
-    st.session_state["learn_active"] = True
-    st.session_state["active_signature"] = selection_signature
-    st.session_state[f"step_{subject}_{topic}_{sub or 'Overview'}"] = 0
+    # 🔒 Password-gated Teacher View
+    teacher_toggle = st.checkbox("🔒 Teacher View (password required)")
+    teacher_mode = False
+    if teacher_toggle:
+        if not st.session_state.get("teacher_ok", False):
+            pw = st.text_input("Enter teacher password", type="password", key="teacher_pw")
+            if st.button("Unlock", type="primary"):
+                expected = _get_teacher_pass()
+                if not expected:
+                    st.warning("Teacher password is not set. Ask admin to set TEACHER_PASS in Streamlit Secrets.")
+                elif pw == expected:
+                    st.session_state["teacher_ok"] = True
+                    st.success("Teacher View unlocked for this session.")
+                else:
+                    st.error("Incorrect password.")
+        teacher_mode = st.session_state.get("teacher_ok", False)
+    else:
+        st.session_state["teacher_ok"] = False
 
-if st.session_state.get("learn_active") and st.session_state.get("active_signature") == selection_signature:
-    learn_mode(subject, level, topic, sub, teacher_mode)
+    # Start / Resume Learn Mode (reset when dropdowns change)
+    selection_signature = f"{subject}|{topic}|{sub or 'Overview'}"
+    if st.session_state.get("active_signature") and st.session_state["active_signature"] != selection_signature:
+        st.session_state["learn_active"] = False
+        st.session_state["active_signature"] = selection_signature
+
+    start_clicked = st.button("Start Learn Mode ▶️", key="start_learn")
+    if start_clicked:
+        st.session_state["learn_active"] = True
+        st.session_state["active_signature"] = selection_signature
+        st.session_state[f"step_{subject}_{topic}_{sub or 'Overview'}"] = 0
+
+    if st.session_state.get("learn_active") and st.session_state.get("active_signature") == selection_signature:
+        learn_mode(CONFIG, subject, level, topic, sub, teacher_mode)
