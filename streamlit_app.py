@@ -318,6 +318,84 @@ def render_teacher_notes(notes: Dict[str, Any]):
             st.markdown(f"- {sa}")
 
 
+def render_teacher_panel(entry: Dict[str, Any]):
+    """Compact teacher-only dashboard shown in the sidebar."""
+    notes = entry.get("teacher_notes", {}) or {}
+    st.markdown("### 👩‍🏫 Teacher Panel")
+
+    # Lecture plan / pacing
+    if notes.get("lecture_script") or notes.get("pacing"):
+        st.markdown("**Lecture plan & pacing**")
+        for b in notes.get("lecture_script", []):
+            st.markdown(f"- {b}")
+        if notes.get("pacing"):
+            st.caption(f"⏱️ Pacing: {notes['pacing']}")
+
+    # Socratic prompts
+    if notes.get("socratic_prompts"):
+        st.markdown("**Socratic prompts**")
+        for q in notes["socratic_prompts"]:
+            st.markdown(f"- {q}")
+
+    # Misconceptions (from entry)
+    if entry.get("misconceptions"):
+        st.markdown("**Common misconceptions**")
+        for m in entry["misconceptions"]:
+            st.markdown(f"- {m}")
+
+    # Board / slide plan
+    if notes.get("board_plan"):
+        st.markdown("**Board/Slide plan**")
+        for b in notes["board_plan"]:
+            st.markdown(f"- {b}")
+
+    # Live checks
+    if notes.get("live_checks"):
+        st.markdown("**Live checks (CFU)**")
+        for c in notes["live_checks"]:
+            st.markdown(f"- {c}")
+
+    # Textbook pointers
+    if entry.get("textbook_pointers"):
+        st.markdown("**Textbook pointers (Tragakes)**")
+        tps = entry["textbook_pointers"]
+        for it in (tps if isinstance(tps, list) else [tps]):
+            st.markdown(f"- {it}")
+
+    # Model answers quick access
+    if notes.get("sample_answers"):
+        with st.expander("Model answers (quick)"):
+            for sa in notes["sample_answers"]:
+                st.markdown(f"- {sa}")
+
+
+def render_visuals(items: List[Any]):
+    if not items:
+        return
+    section_title("Visuals")
+    n = min(3, len(items))
+    cols = st.columns(n)
+    for i, itm in enumerate(items):
+        with cols[i % n]:
+            src, cap = None, ""
+            if isinstance(itm, dict):
+                src = itm.get("src") or itm.get("url")
+                cap = itm.get("caption", "")
+            elif isinstance(itm, str):
+                src = itm
+            if not src:
+                continue
+            lower = src.lower()
+            if lower.endswith((".png", ".jpg", ".jpeg", ".webp", ".gif")):
+                st.image(src, caption=cap, use_column_width=True)
+            elif lower.endswith(".svg"):
+                st.markdown(f'<img src="{src}" style="max-width:100%; height:auto;"/>', unsafe_allow_html=True)
+                if cap:
+                    st.caption(cap)
+            else:
+                st.warning(f"Unsupported visual format: {src}. Use PNG/JPG/SVG.")
+
+
 def render_textbook_pointers(ptrs):
     if not ptrs:
         return
@@ -368,6 +446,8 @@ def learn_mode(CONFIG: dict, subject: str, level: str, topic: str, subtopic: str
         steps.append(("Explain", lambda: render_explanation(entry.get("explanation", []))))
     if entry.get("textbook_pointers"):
         steps.append(("Textbook pointers", lambda: render_textbook_pointers(entry.get("textbook_pointers"))))
+    if entry.get("visuals"):
+        steps.append(("Visuals", lambda: render_visuals(entry.get("visuals"))))
     if entry.get("diagram"):
         steps.append(("Interactive Diagram", lambda: render_diagram_step(entry)))
     if entry.get("worked_examples"):
@@ -421,7 +501,6 @@ def learn_mode(CONFIG: dict, subject: str, level: str, topic: str, subtopic: str
 
 # ───────────────── UI ─────────────────
 
-
 st.title("📘 SkillNestEdu Course Engine")
 st.subheader("Your AI-powered self-study lesson builder")
 
@@ -465,6 +544,12 @@ else:
         st.session_state["learn_active"] = False
         st.session_state["active_signature"] = selection_signature
 
+    # 👩‍🏫 Sidebar teacher panel (visible only to teachers)
+    if teacher_mode:
+        entry_preview = CONFIG[subject][topic][sub or "Overview"]
+        with st.sidebar:
+            render_teacher_panel(entry_preview)
+
     start_clicked = st.button("Start Learn Mode ▶️", key="start_learn")
     if start_clicked:
         st.session_state["learn_active"] = True
@@ -473,3 +558,4 @@ else:
 
     if st.session_state.get("learn_active") and st.session_state.get("active_signature") == selection_signature:
         learn_mode(CONFIG, subject, level, topic, sub, teacher_mode)
+
