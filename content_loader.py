@@ -21,7 +21,7 @@ def ordered_keys(d: dict, order_key: str = "_order") -> list:
     return keys
 
 def load_content(content_dir: str = "content") -> dict:
-    """Load all YAML files and tell you exactly which one fails."""
+    """Load all YAML files and show a clear error with file + line if one is invalid."""
     config: dict = {}
     if not os.path.isdir(content_dir):
         st.error("Missing /content folder.")
@@ -35,7 +35,7 @@ def load_content(content_dir: str = "content") -> dict:
             with open(path, "r", encoding="utf-8") as f:
                 data = yaml.safe_load(f) or {}
         except yaml.YAMLError as e:
-            st.error(f"❌ YAML error in **{fname}**. Check indentation/quotes near the line mentioned below.\n\n**Details:** {e}")
+            st.error(f"❌ YAML error in **{fname}**. Fix the indentation/quotes near the line shown below.\n\n**Details:** {e}")
             st.stop()
         _deep_merge(config, data)
     return config
