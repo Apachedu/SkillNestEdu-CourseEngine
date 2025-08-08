@@ -9,7 +9,7 @@ import yaml
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 
-"""
+_APP_README = """
 SkillNestEdu Course Engine (Streamlit)
 - Self-study Learn Mode with teacher view
 - Secret-based Google auth (no credentials file committed)
@@ -588,7 +588,7 @@ def render_short_questions(items: List[Dict[str, Any]], teacher_mode: bool):
                 st.markdown(f"*Hint {j}:* {hint}")
             if teacher_mode and q.get("model_answer"):
                 st.markdown("**Model Answer**")
-                st.markdown(q["model_answer"])()
+                st.markdown(q["model_answer"])
 
 
 def render_extended_questions(items: List[Dict[str, Any]], teacher_mode: bool):
@@ -605,7 +605,7 @@ def render_extended_questions(items: List[Dict[str, Any]], teacher_mode: bool):
                 st.caption(q["criteria"])
             if teacher_mode and q.get("model_answer"):
                 st.markdown("**Model Answer**")
-                st.markdown(q["model_answer"])()
+                st.markdown(q["model_answer"])
 
 
 def render_mcqs(items: List[Dict[str, Any]]):
@@ -754,6 +754,7 @@ key_active = f"step_{subject}_{topic}_{sub or 'Overview'}"
 if key_active in st.session_state:
     learn_mode(subject, level, topic, sub, teacher_mode)
 
-# Optional debug
-with st.expander("Show raw CONFIG"):
-    st.json(CONFIG)
+# Optional debug (hidden unless DEV_MODE is enabled)
+if st.secrets.get("DEV_MODE") or os.environ.get("DEV_MODE"):
+    with st.expander("Show raw CONFIG"):
+        st.json(CONFIG)
