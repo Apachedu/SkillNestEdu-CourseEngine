@@ -563,4 +563,3 @@ else:
 
     if st.session_state.get("learn_active") and st.session_state.get("active_signature") == selection_signature:
         learn_mode(CONFIG, subject, level, topic, sub, teacher_mode)
-
