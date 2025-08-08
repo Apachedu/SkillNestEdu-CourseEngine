@@ -1,7 +1,21 @@
 Economics:
   _order: ["Foundations of Economics", "Elasticity"]
-  Foundations of Economics:
+   Foundations of Economics:
     _order: ["Overview", "Production Possibility Curve"]
+
+    _defaults:
+      teacher_notes:
+        pacing: "45–55 min"
+        lecture_script:
+          - "Define assumptions of the PPC (fixed resources/technology)."
+          - "Inside vs on vs outside."
+          - "Show outward shift causes (resources, technology)."
+        socratic_prompts:
+          - "If tech improves only for Good A, how does the frontier change?"
+        board_plan:
+          - "Draw base PPC with points A,B,C; annotate OC."
+        live_checks:
+          - "Thumbs: inside vs on vs outside?"
 
     Overview:
       time_estimate: "60 minutes"
