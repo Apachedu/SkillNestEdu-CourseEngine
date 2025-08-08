@@ -161,26 +161,32 @@ def ppc_diagram():
         dA, dB = 8 - 6, yC - yB
         oc = abs(dB / dA) if dA != 0 else float("nan")  # B per 1 A
         oc_scaled = oc * scale
+        # Scale the displayed gains/losses to match the selected unit scale
+        gain_A = scale  # show scenario for scale units of A
+        loss_B = oc_scaled
         c1, c2, c3 = st.columns(3)
         with c1:
-            st.metric("Gain in A", f"+{dA:.0f} units")
+            st.metric("Gain in A", f"+{gain_A:.0f} units")
         with c2:
-            st.metric("Loss in B", f"{abs(dB):.1f} units")
+            st.metric("Loss in B", f"{loss_B:.1f} units")
         with c3:
-            st.metric(f"OC (B per {scale} A)", f"{oc_scaled:.0f}" if scale > 1 else f"{oc:.2f}")
-        st.caption(f"Per unit view: **{oc:.2f} B per 1 A**.")
+            st.metric(f"OC (B per {scale} A)", f"{oc_scaled:.1f}" if scale > 1 else f"{oc:.2f}")
+        st.caption(f"Base movement on the chart is B→C (ΔA={dA}, ΔB={abs(dB):.1f}); scale shows an equivalent ratio for {scale} A.")
     else:
         dB, dA = (yB - yA), 6 - 2
         oc = abs(dA / dB) if dB != 0 else float("nan")  # A per 1 B
         oc_scaled = oc * scale
+        # Scale the displayed gains/losses to match the selected unit scale
+        gain_B = scale  # show scenario for scale units of B
+        loss_A = oc_scaled
         c1, c2, c3 = st.columns(3)
         with c1:
-            st.metric("Gain in B", f"+{dB:.1f} units")
+            st.metric("Gain in B", f"+{gain_B:.1f} units")
         with c2:
-            st.metric("Loss in A", f"{abs(dA):.0f} units")
+            st.metric("Loss in A", f"{loss_A:.1f} units")
         with c3:
-            st.metric(f"OC (A per {scale} B)", f"{oc_scaled:.0f}" if scale > 1 else f"{oc:.2f}")
-        st.caption(f"Per unit view: **{oc:.2f} A per 1 B**.")
+            st.metric(f"OC (A per {scale} B)", f"{oc_scaled:.1f}" if scale > 1 else f"{oc:.2f}")
+        st.caption(f"Base movement on the chart is A→B (ΔB={abs(dB):.1f}, ΔA={dA}); scale shows an equivale
 
     st.markdown("_Tip: On a concave PPC, OC rises as you move right—resources are specialized._")
 
@@ -855,12 +861,3 @@ else:
 
 # Start Learn Mode: set active signature in session state, render exactly once per run
 signature = f"{subject}|{topic}|{sub or 'Overview'}"
-start_clicked = st.button("Start Learn Mode ▶️", key="start_learn")
-if start_clicked:
-    st.session_state["learn_active"] = True
-    st.session_state["active_signature"] = signature
-    # reset step position when starting a new lesson
-    st.session_state[f"step_{subject}_{topic}_{sub or 'Overview'}"] = 0
-
-if st.session_state.get("learn_active") and st.session_state.get("active_signature") == signature:
-    learn_mode(subject, level, topic, sub, teacher_mode)
