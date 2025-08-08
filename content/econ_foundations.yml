@@ -4,6 +4,33 @@ Economics:
     _order: ["Overview", "Production Possibility Curve"]
 
     Overview:
+        visuals:
+      - src: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bb/Production_Possibility_Frontier.svg/1024px-Production_Possibility_Frontier.svg.png"
+        caption: "Why scarcity & choice lead to a PPC"
+      - src: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/PPF_expansion.svg/1024px-PPF_expansion.svg.png"
+        caption: "Economic growth: outward shift of the frontier"
+
+    teacher_notes:
+      pacing: "35–45 min"
+      lecture_script:
+        - "Hook: real scarcity example (ICU beds, water) → choices must be made."
+        - "Define scarcity, choice, opportunity cost with 1 everyday example."
+        - "Positive vs normative: show one of each; ask class to label."
+        - "Factors of production & rewards: land, labour, capital, enterprise."
+        - "Connect to PPC: limited resources ⇒ maximum feasible output boundary."
+      socratic_prompts:
+        - "Is every trade-off an opportunity cost? Give a counterexample."
+        - "Can a statement be both positive and normative? Why/why not?"
+      board_plan:
+        - "T-chart: Positive vs Normative (2 examples each)."
+        - "Table: FoP → reward (rent, wages, interest, profit)."
+        - "Mini PPC sketch to foreshadow next lesson."
+      live_checks:
+        - "Cold-call: define OC in one sentence."
+        - "Exit slip: one positive & one normative statement from news."
+      sample_answers:
+        - "OC: the next best alternative foregone when a choice is made."
+        - "Positive: 'Unemployment is 5%.' Normative: 'Govt should lower taxes.'"
       time_estimate: "60 minutes"
       learning_objectives:
         - "Define economics, scarcity, choice, and opportunity cost."
