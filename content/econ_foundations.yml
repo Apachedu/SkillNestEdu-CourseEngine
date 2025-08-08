@@ -4,4 +4,5 @@ Economics:
     _order: ["Overview"]
     Overview:
       time_estimate: "60 minutes"
-      learning_objectives: []
+      learning_objectives:
+        - "Define economics, scarcity, choice, and opportunity cost."
