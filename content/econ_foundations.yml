@@ -3,11 +3,14 @@ Economics:
   Foundations of Economics:
     _order: ["Overview", "Production Possibility Curve"]
 
-    Overview:
-        visuals:
+  Overview:
+    visuals:
       - src: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bb/Production_Possibility_Frontier.svg/1024px-Production_Possibility_Frontier.svg.png"
         caption: "Why scarcity & choice lead to a PPC"
       - src: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/PPF_expansion.svg/1024px-PPF_expansion.svg.png"
+        caption: "Economic growth: outward shift of the frontier"
+
+    e/ef/PPF_expansion.svg/1024px-PPF_expansion.svg.png"
         caption: "Economic growth: outward shift of the frontier"
 
     teacher_notes:
