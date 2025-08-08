@@ -9,7 +9,7 @@ import numpy as np
 
 # Load split YAML content
 try:
-    from content_loader import load_content, ordered_keys
+    from content_loader import load_content, ordered_keys, NOT_THERE  # force ImportError → use inline loader
 except Exception:
     # Fallback inline loader (works if content_loader.py missing)
     import yaml
