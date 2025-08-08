@@ -17,15 +17,18 @@ Business Management:
         - "IB BM: Unit 1.2 Types of organization (overview)."
       misconceptions:
         - "Non-profits do not make any surplus (they can, but reinvest surpluses)."
+
       command_terms:
-        - term: Compare
+        - term: "Compare"
           definition: "Give an account of similarities and differences."
           mini_frame: "Similarities → Differences → Mini-conclusion."
+
       short_questions:
         - question: "List three ownership forms and one feature of each."
           hint_chain:
             - "Think liability and control."
           model_answer: "Sole trader (unlimited liability), Partnership (shared control), Corporation (limited liability)."
+
       extended_questions:
         - question: "Discuss whether social enterprises can be as financially sustainable as for-profits."
           planning_scaffold:
@@ -35,6 +38,7 @@ Business Management:
             - "Impact measurement."
           criteria: "AO3 Discuss"
           model_answer: "Under certain models (hybrids, cross-subsidy) they can; depends on market, governance, and funding."
+
       mcqs:
         - question: "Which structure limits owner liability?"
           options:
@@ -48,12 +52,16 @@ Business Management:
             B: "Partners usually have unlimited liability."
             C: "Correct."
             D: "General partners have unlimited liability."
+
       exit_ticket:
         - "Define 'stakeholder' in one line."
+
       ia_scaffold:
         - "Design stakeholder interview questions."
+
       ee_scaffold:
         - "Build a case study framework for governance analysis."
+
       teacher_notes:
         pacing: "35–45 min"
         lecture_script:
@@ -71,7 +79,7 @@ Business Management:
           - "Cold-call: define limited liability."
           - "Think-pair-share: pros/cons of incorporation."
         talking_points:
-          - "Clarify difference between purpose (mission) and profit distribution."
+          - "Clarify liability vs control."
           - "Use real examples students know."
         sample_answers:
           - "Stakeholder: any person or group affected by an organization's decisions (e.g., employees, customers, community)."
