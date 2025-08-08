@@ -1,5 +1,7 @@
-import os, yaml
+import os
 from copy import deepcopy
+import yaml
+import streamlit as st
 
 def _deep_merge(dest: dict, src: dict):
     for k, v in src.items():
@@ -9,19 +11,6 @@ def _deep_merge(dest: dict, src: dict):
             dest[k] = deepcopy(v)
     return dest
 
-def load_content(content_dir: str = "content") -> dict:
-    config: dict = {}
-    if not os.path.isdir(content_dir):
-        return config
-    for fname in sorted(os.listdir(content_dir)):
-        if not fname.lower().endswith((".yml", ".yaml")):
-            continue
-        path = os.path.join(content_dir, fname)
-        with open(path, "r", encoding="utf-8") as f:
-            data = yaml.safe_load(f) or {}
-        _deep_merge(config, data)
-    return config
-
 def ordered_keys(d: dict, order_key: str = "_order") -> list:
     if not isinstance(d, dict):
         return []
@@ -30,3 +19,23 @@ def ordered_keys(d: dict, order_key: str = "_order") -> list:
     if explicit:
         keys += [k for k in d.keys() if k not in explicit and k != order_key]
     return keys
+
+def load_content(content_dir: str = "content") -> dict:
+    """Load all YAML files and tell you exactly which one fails."""
+    config: dict = {}
+    if not os.path.isdir(content_dir):
+        st.error("Missing /content folder.")
+        return config
+
+    for fname in sorted(os.listdir(content_dir)):
+        if not fname.lower().endswith((".yml", ".yaml")):
+            continue
+        path = os.path.join(content_dir, fname)
+        try:
+            with open(path, "r", encoding="utf-8") as f:
+                data = yaml.safe_load(f) or {}
+        except yaml.YAMLError as e:
+            st.error(f"❌ YAML error in **{fname}**. Check indentation/quotes near the line mentioned below.\n\n**Details:** {e}")
+            st.stop()
+        _deep_merge(config, data)
+    return config
