@@ -293,34 +293,41 @@ def render_teacher_notes(notes: Dict[str, Any]):
 def render_teacher_panel(entry: Dict[str, Any]):
     with st.sidebar:
         st.markdown("### 🧑‍🏫 Teacher Panel")
-        tn = entry.get("teacher_notes", {})
+
+        tn = entry.get("teacher_notes") or {}
+
+        # Pacing at the top (if provided)
         if tn.get("pacing"):
             st.caption(f"⏱️ {tn['pacing']}")
-        if tn.get("lecture_script"):
-            with st.expander("Lecture script", True):
-                for x in tn["lecture_script"]:
-                    st.markdown(f"- {x}")
-        if tn.get("socratic_prompts"):
-            with st.expander("Socratic prompts"):
-                for x in tn["socratic_prompts"]:
-                    st.markdown(f"- {x}")
-        if tn.get("board_plan"):
-            with st.expander("Board plan"):
-                for x in tn["board_plan"]:
-                    st.markdown(f"- {x}")
-        if tn.get("live_checks"):
-            with st.expander("Live checks"):
-                for x in tn["live_checks"]:
-                    st.markdown(f"- {x}")
-        # Helpful always
-        if entry.get("textbook_pointers"):
-            with st.expander("Textbook pointers"):
-                for x in entry["textbook_pointers"]:
-                    st.markdown(f"- {x}")
-        if entry.get("misconceptions"):
-            with st.expander("Common misconceptions"):
-                for x in entry["misconceptions"]:
-                    st.markdown(f"- {x}")
+
+        # title, items, expanded_by_default
+        blocks = [
+            ("Lecture script", tn.get("lecture_script"), True),
+            ("Talking points", tn.get("talking_points"), True),
+            ("Sample answers", tn.get("sample_answers"), False),
+            ("Socratic prompts", tn.get("socratic_prompts"), False),
+            ("Board plan", tn.get("board_plan"), False),
+            ("Live checks", tn.get("live_checks"), False),
+            ("Textbook pointers", entry.get("textbook_pointers"), False),
+            ("Common misconceptions", entry.get("misconceptions"), False),
+        ]
+
+        for title, items, expanded in blocks:
+            if not items:
+                continue
+            with st.expander(title, expanded):
+                # items can be list or dict (rare). Handle both.
+                if isinstance(items, dict):
+                    for k, v in items.items():
+                        st.markdown(f"- **{k}:** {v}")
+                else:
+                    for x in items:
+                        st.markdown(f"- {x}")
+
+        # Uncomment to quickly inspect what the app loaded for this subtopic
+        # if st.checkbox("Debug: show raw teacher data"):
+        #     st.json({"teacher_notes": tn, "entry_keys": list(entry.keys())})
+
 
 
 # =============== Learn Mode orchestrator ===============
