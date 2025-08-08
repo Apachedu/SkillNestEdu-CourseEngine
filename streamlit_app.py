@@ -182,7 +182,7 @@ def ppc_diagram():
             st.metric(f"OC (A per {scale} B)", f"{oc_scaled:.0f}" if scale > 1 else f"{oc:.2f}")
         st.caption(f"Per unit view: **{oc:.2f} A per 1 B**.")
 
-    st.markdown("_Tip: On a concave PPC, OC rises as you move right—resources are s
+    st.markdown("_Tip: On a concave PPC, OC rises as you move right—resources are specialized._")
 
 
 def elasticity_diagram():
