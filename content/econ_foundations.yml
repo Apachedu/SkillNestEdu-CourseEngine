@@ -261,3 +261,19 @@ Economics:
           options: {A: "increase in labour only", B: "neutral technological progress", C: "reallocation of resources", D: "higher unemployment"}
           answer: B
           rationales: {A: "Biased to labour‑intensive good, not parallel.", B: "Correct: raises productivity in both goods.", C: "Movement along, not shift.", D: "Moves inside, not shift."}
+            teacher_notes:
+        pacing: "45–55 min"
+        lecture_script:
+          - "Warm-up: scarcity vs shortage → choices."
+          - "Define PPC assumptions (fixed resources/tech)."
+          - "Inside/on/outside; productive vs allocative efficiency."
+          - "Slider demo: outward shift; causes & who gains."
+        socratic_prompts:
+          - "If tech improves only in Good A, how does the frontier change?"
+          - "Does growth remove scarcity? Why/why not?"
+        board_plan:
+          - "Draw base PPC with A,B,C; annotate OC on B→C."
+          - "Show pivot vs parallel shift sketches."
+        live_checks:
+          - "Thumbs: Inside vs On vs Outside?"
+          - "1-min write: define OC using B→C."
