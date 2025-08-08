@@ -33,9 +33,7 @@ def load_content(content_dir: str = "content") -> dict:
             with open(path, "r", encoding="utf-8") as f:
                 data = yaml.safe_load(f) or {}
         except Exception as e:
-            st.error(f"❌ YAML error in **{fname}**
-
-{type(e).__name__}: {e}")
+            st.error(f"❌ YAML error in **{fname}**\n\n{type(e).__name__}: {e}")
             st.stop()
         _deep_merge(config, data)
     return config
