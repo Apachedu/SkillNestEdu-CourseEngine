@@ -1,21 +1,7 @@
 Economics:
-  _order: ["Foundations of Economics", "Elasticity"]
-   Foundations of Economics:
+  _order: ["Foundations of Economics"]
+  Foundations of Economics:
     _order: ["Overview", "Production Possibility Curve"]
-
-    _defaults:
-      teacher_notes:
-        pacing: "45–55 min"
-        lecture_script:
-          - "Define assumptions of the PPC (fixed resources/technology)."
-          - "Inside vs on vs outside."
-          - "Show outward shift causes (resources, technology)."
-        socratic_prompts:
-          - "If tech improves only for Good A, how does the frontier change?"
-        board_plan:
-          - "Draw base PPC with points A,B,C; annotate OC."
-        live_checks:
-          - "Thumbs: inside vs on vs outside?"
 
     Overview:
       time_estimate: "60 minutes"
@@ -27,251 +13,352 @@ Economics:
         - "Explain how economic systems answer the three basic questions."
       prereq_recap:
         - "Basic graph reading; correlation vs causation."
-        - "Percent & ratio calculations (for later topics)."
+        - "Percent and ratio calculations (for later topics)."
       explanation:
-        - "**Scarcity**: resources are finite while wants are unlimited; scarcity ≠ temporary shortage."
-        - "**Choice**: because of scarcity, societies must choose among competing uses of resources."
-        - "**Opportunity cost (OC)**: the next best alternative forgone when a choice is made."
-        - "**Why economics exists**: to study how best to allocate scarce resources (what/how/for whom)."
-        - "**From scarcity to PPC**: if resources are fixed, the set of maximum output mixes forms a boundary—the PPC."
-        - "**Reading PPC**: each point is a **choice**; the **slope** measures OC; **shifts** reflect changes in resources/technology."
-        - "Micro vs macro, positive vs normative, and factors of production (land/labour/capital/enterprise) as foundations."
+        - "Scarcity: resources are finite while wants are unlimited; scarcity is not a temporary shortage."
+        - "Choice: because of scarcity, societies must choose among competing uses of resources."
+        - "Opportunity cost (OC): the next best alternative forgone when a choice is made."
+        - "Why economics exists: to study how best to allocate scarce resources (what, how, for whom)."
+        - "From scarcity to PPC: with fixed resources, the set of maximum output mixes forms a boundary (the PPC)."
+        - "Reading PPC: each point is a choice; the slope measures OC; shifts reflect resource/technology changes."
+        - "Foundations: micro vs macro; positive vs normative; factors of production (land, labour, capital, enterprise)."
       tok_insight: |
-        **Knowledge question:** To what extent do simplified models like the PPC help or hinder understanding of real economies?
-        Consider assumptions (fixed technology, two goods, ceteris paribus) and the trade‑off between simplicity and realism.
+        Knowledge question: To what extent do simplified models like the PPC help or hinder understanding of real economies?
+        Consider assumptions (fixed technology, two goods, ceteris paribus) and the trade-off between simplicity and realism.
       textbook_pointers:
-        - "Tragakes (3rd ed., Cambridge 2020): Chapter 1 — 'What is Economics?' sections on Scarcity, Choice, Opportunity Cost, PPC."
-        - "Also see introductory notes on ceteris paribus and model assumptions."
+        - "Tragakes (3rd ed., Cambridge 2020): Chapter 1 (Scarcity, Choice, Opportunity Cost, PPC)."
+        - "See notes on ceteris paribus and model assumptions."
       glossary:
-        Scarcity: "Unlimited wants vs finite resources; ever-present condition."
-        Shortage: "Temporary market situation where Qd > Qs at a given price; not the same as scarcity."
+        Scarcity: "Unlimited wants with finite resources."
+        Shortage: "Temporary situation where quantity demanded exceeds quantity supplied at a given price."
         Choice: "Selecting among alternatives because of scarcity."
         Opportunity cost: "The next best alternative forgone when a choice is made."
-        Factors of production: "Land, labour, capital, entrepreneurship (rewards: rent, wages, interest, profit)."
-        PPC: "Boundary of maximum feasible output combinations given resources and technology."
-        Productive efficiency: "On the PPC—cannot increase output of one good without reducing the other."
-        Allocative efficiency: "Mix of goods that maximizes social welfare; not shown by PPC alone."
-        Economic growth: "Outward shift of PPC over time."
-        Ceteris paribus: "'All else equal'—used to isolate relationships."
+        Factors of production: "Land, labour, capital, entrepreneurship; rewards: rent, wages, interest, profit."
+        PPC: "Boundary of maximum feasible output combinations for given resources and technology."
+        Productive efficiency: "On the PPC—cannot increase one good without reducing the other."
+        Allocative efficiency: "Mix of goods that maximizes welfare (not shown by PPC alone)."
+        Economic growth: "Outward shift of the PPC over time."
+        Ceteris paribus: "All else equal—used to isolate relationships."
       worked_examples:
         - title: "Classify statements: positive or normative"
           steps:
-            - "'Inflation fell to 4.8%' vs 'The central bank should cut rates now'."
+            - "Inflation fell to 4.8% vs The central bank should cut rates now."
             - "Ask: can we test the statement with data?"
-            - "Label each as positive/normative and justify briefly."
+            - "Label each and justify briefly."
           notes:
-            - "Words like 'should' often signal normative."
-          solution: "First is positive (testable with data). Second is normative (value judgement about policy)."
+            - "Words like should often signal normative."
+          solution: "First is positive (testable). Second is normative (value judgement)."
         - title: "Compute opportunity cost from a simple choice"
           steps:
-            - "You have 2 hours to study: 1h Econ + 1h Math, or 2h Econ."
+            - "You have 2 hours: 1h Econ + 1h Math, or 2h Econ."
             - "If you choose 2h Econ, what is your opportunity cost?"
-            - "State it explicitly."
           notes:
-            - "Opportunity cost is the best alternative forgone, not all alternatives."
-          solution: "1 hour of Math study is the opportunity cost of the extra hour of Econ."
+            - "OC is the best alternative forgone, not all alternatives."
+          solution: "1 hour of Math is the OC of the extra hour of Econ."
         - title: "Identify factors of production in a scenario"
           steps:
-            - "A bakery uses an oven, flour, bakers, and the owner's talent to design recipes."
-            - "Map each item to FoP: land, labour, capital, enterprise."
+            - "Bakery uses an oven, flour, bakers, and owner’s talent."
+            - "Map each to land, labour, capital, enterprise."
           notes:
-            - "Capital is man-made aid to production; land includes natural resources."
-          solution: "Oven = capital; flour = input from land; bakers = labour; owner = entrepreneurship."
+            - "Capital is man-made aid; land includes natural resources."
+          solution: "Oven = capital; flour = land input; bakers = labour; owner = entrepreneurship."
       misconceptions:
-        - "Scarcity equals poverty (No—rich economies still face scarcity)."
-        - "Opportunity cost is the money price (It may be time, convenience, etc.)."
-        - "Positive = good, normative = bad (No—these are methodological categories)."
+        - "Scarcity equals poverty."
+        - "Opportunity cost is the money price."
+        - "Positive means good; normative means bad."
       command_terms:
-        - term: Define
-          definition: "Give the precise meaning of a word/phrase."
-          mini_frame: "Definition → concise example (optional)."
-        - term: Distinguish
-          definition: "Make clear the differences between two or more concepts."
-          mini_frame: "Criterion 1/2/3 → How they differ."
-        - term: Explain
+        - term: "Define"
+          definition: "Give the precise meaning of a word or phrase."
+          mini_frame: "Definition then short example."
+        - term: "Distinguish"
+          definition: "Make clear the differences between concepts."
+          mini_frame: "Criterion 1/2/3 then differences."
+        - term: "Explain"
           definition: "Give a detailed account including reasons or causes."
-          mini_frame: "Cause → Mechanism → Effect."
-        - term: Evaluate
+          mini_frame: "Cause → mechanism → effect."
+        - term: "Evaluate"
           definition: "Make an appraisal by weighing strengths and limitations."
-          mini_frame: "Criteria → Pros/Cons → Judgement."
+          mini_frame: "Criteria → pros/cons → judgement."
       short_questions:
         - question: "Define scarcity and explain why it necessitates choice."
           hint_chain:
             - "Link limited resources to unlimited wants."
-            - "State the consequence for decision-making."
-          model_answer: "Scarcity is the condition of finite resources and unlimited wants; it forces choice about resource allocation."
+            - "State consequence for decision-making."
+          model_answer: "Scarcity is finite resources and unlimited wants; it forces choices about allocation."
         - question: "Distinguish positive and normative statements with one example of each."
           hint_chain:
             - "Ask: is it testable?"
-            - "Use 'should' as a clue for normative."
-          model_answer: "Positive: 'Minimum wage increased by 5%' (testable). Normative: 'Minimum wage should rise' (value judgement)."
+            - "Use should as a clue for normative."
+          model_answer: "Positive: Minimum wage increased by 5% (testable). Normative: Minimum wage should rise (value judgement)."
         - question: "Identify the factor of production and reward: a software developer's salary."
           hint_chain:
             - "Think labour, land, capital, enterprise."
           model_answer: "Labour; reward is wages."
       extended_questions:
-        - question: "Evaluate whether a free‑market system or a planned system is better at answering the three basic economic questions."
+        - question: "Evaluate whether a free-market system or a planned system is better at answering the three basic questions."
           planning_scaffold:
             - "Define both systems briefly."
             - "Criteria: efficiency, equity, innovation, stability."
             - "Use examples; consider mixed economies."
-            - "Conclude with reasoned judgement."
+            - "Conclude with judgement."
           criteria: "AO3 Evaluate"
-          model_answer: "Markets harness price signals and incentives for efficiency and innovation, but may underprovide public goods/equity; planning coordinates at scale but faces information/incentive problems. Most adopt mixed systems; effectiveness depends on institutions and context."
+          model_answer: "Markets use price signals for efficiency and innovation but may underprovide equity/public goods; planning coordinates but faces information/incentive problems. Most adopt mixed systems."
         - question: "To what extent can opportunity cost be zero?"
           planning_scaffold:
-            - "Clarify 'next best alternative'."
-            - "Consider idle resources vs true 'free' goods."
-            - "Use PPC and time‑allocation examples."
+            - "Clarify next best alternative."
+            - "Idle resources vs true free goods."
+            - "Use PPC and time allocation examples."
           criteria: "AO3 Evaluate"
-          model_answer: "True zero OC is rare except with free goods or slack time where no alternative is forgone; generally, some alternative use exists, so OC > 0."
+          model_answer: "True zero OC is rare except with free goods or slack time; generally some alternative use exists."
       mcqs:
         - question: "Which is a normative statement?"
-          options: {A: "Unemployment is 7%", B: "The government should reduce unemployment", C: "Exports rose last quarter", D: "The tax rate is 18%"}
-          answer: B
-          rationales: {A: "Testable (positive).", B: "Contains 'should'—value judgement.", C: "Testable.", D: "Testable."}
-        - question: "Microeconomics primarily studies …"
-          options: {A: "National output and inflation", B: "Behaviour of individual firms and consumers", C: "Global trade balances", D: "Fiscal policy"}
-          answer: B
-          rationales: {A: "Macro focus.", B: "Correct.", C: "Macro/international.", D: "Macro policy."}
-        - question: "The reward for the factor 'land' is …"
-          options: {A: "Wages", B: "Interest", C: "Rent", D: "Profit"}
-          answer: C
-          rationales: {A: "Labour.", B: "Capital.", C: "Correct.", D: "Enterprise."}
-        - question: "Opportunity cost refers to …"
-          options: {A: "The money paid for a good", B: "The next best alternative forgone", C: "All alternatives not chosen", D: "Sunk cost"}
-          answer: B
-          rationales: {A: "Price not OC.", B: "Correct.", C: "Only the next best matters.", D: "Past costs are irrelevant."}
+          options:
+            A: "Unemployment is 7%."
+            B: "The government should reduce unemployment."
+            C: "Exports rose last quarter."
+            D: "The tax rate is 18%."
+          answer: "B"
+          rationales:
+            A: "Testable (positive)."
+            B: "Contains should—value judgement."
+            C: "Testable."
+            D: "Testable."
+        - question: "Microeconomics primarily studies…"
+          options:
+            A: "National output and inflation."
+            B: "Behaviour of individual firms and consumers."
+            C: "Global trade balances."
+            D: "Fiscal policy."
+          answer: "B"
+          rationales:
+            A: "Macro focus."
+            B: "Correct."
+            C: "Macro/international."
+            D: "Macro policy."
+        - question: "The reward for the factor land is…"
+          options:
+            A: "Wages"
+            B: "Interest"
+            C: "Rent"
+            D: "Profit"
+          answer: "C"
+          rationales:
+            A: "Labour."
+            B: "Capital."
+            C: "Correct."
+            D: "Enterprise."
+        - question: "Opportunity cost refers to…"
+          options:
+            A: "The money paid for a good."
+            B: "The next best alternative forgone."
+            C: "All alternatives not chosen."
+            D: "Sunk cost."
+          answer: "B"
+          rationales:
+            A: "Price, not OC."
+            B: "Correct."
+            C: "Only the next best matters."
+            D: "Past costs are irrelevant."
         - question: "Which system relies mainly on price signals?"
-          options: {A: "Planned economy", B: "Market economy", C: "Traditional economy", D: "Autarky"}
-          answer: B
-          rationales: {A: "Central planning.", B: "Correct.", C: "Customs.", D: "Self‑sufficiency (not a system design)."}
-        - question: "A statement 'The central bank should lower interest rates' is …"
-          options: {A: "Positive", B: "Normative", C: "Descriptive", D: "Empirical"}
-          answer: B
-          rationales: {A: "Not testable as a fact.", B: "Correct.", C: "Too vague.", D: "Relates to data, not value."}
+          options:
+            A: "Planned economy."
+            B: "Market economy."
+            C: "Traditional economy."
+            D: "Autarky."
+          answer: "B"
+          rationales:
+            A: "Central planning."
+            B: "Correct."
+            C: "Customs-based."
+            D: "Self-sufficiency (not system design)."
+        - question: "The statement The central bank should lower interest rates is…"
+          options:
+            A: "Positive"
+            B: "Normative"
+            C: "Descriptive"
+            D: "Empirical"
+          answer: "B"
+          rationales:
+            A: "Not a factual claim."
+            B: "Value judgement (should)."
+            C: "Too vague."
+            D: "Relates to data, not value."
       exit_ticket:
         - "Write one positive and one normative statement about a current issue."
-        - "State one trade‑off you faced today and its opportunity cost."
+        - "State one trade-off you faced today and its opportunity cost."
       ia_scaffold:
-        - "Find a recent news article illustrating scarcity or trade‑offs."
+        - "Find a recent news article illustrating scarcity or trade-offs."
         - "Identify relevant concepts (FoP, OC, market vs command)."
-        - "Sketch a PPC or simple diagram if applicable and explain the shift/movement."
+        - "Sketch a PPC and explain any shift or movement."
       ee_scaffold:
-        - "Draft an EE RQ around 'How effectively does [policy] address [scarcity] in [country]?'"
+        - "Draft an EE RQ: How effectively does [policy] address [scarcity] in [country]?"
         - "List data sources and a tentative method."
       teacher_notes:
         talking_points:
-          - "Use local examples of scarcity (e.g., water restrictions) to ground concepts."
-          - "Clarify 'positive vs normative' with classroom poll."
+          - "Use local scarcity examples to ground concepts."
+          - "Run a quick poll for positive vs normative."
         sample_answers:
-          - "Short Q: Labour/wages; Land/rent; Capital/interest; Enterprise/profit."
+          - "FoP rewards: Land→Rent, Labour→Wages, Capital→Interest, Enterprise→Profit."
 
     Production Possibility Curve:
       time_estimate: "45 minutes"
-      diagram: ppc_diagram
-      alt_text: "Concave PPC showing trade‑offs between Good A and Good B."
-      diagram_preamble: "You’re about to see a PPC — the boundary of maximum feasible output. Move the slider to simulate resource/technology changes (shifts)."
+      diagram: "ppc_diagram"
+      alt_text: "Concave PPC showing trade-offs between Good A and Good B."
+      diagram_preamble: "Move the slider to simulate resource/technology changes (shifts)."
       learning_objectives:
         - "Define scarcity and opportunity cost in the context of PPC."
         - "Interpret points inside, on, and outside the PPC."
-        - "Explain outward/inward shifts and their causes."
+        - "Explain outward and inward shifts and their causes."
       prereq_recap:
         - "Factors of production: land, labour, capital, enterprise."
         - "Basic graph reading (axes, intercepts)."
       explanation:
-        - "**Why PPC arises**: Scarcity forces **choice**—with fixed resources, only certain output mixes are attainable."
-        - "**Opportunity cost on PPC**: moving along the curve shows what must be **given up** of one good to gain more of the other (slope = OC)."
-        - "**Concavity**: resources are specialized → increasing OC → bowed‑out frontier."
-        - "**Points**: inside = inefficiency/unemployment; on = productive efficiency; outside = currently unattainable."
-        - "**Shifts vs movements**: movements = reallocation; shifts = capacity change (resources/technology)."
+        - "Why PPC arises: scarcity forces choice; only certain output mixes are attainable."
+        - "Opportunity cost on PPC: moving along the curve shows what must be given up of one good to gain another."
+        - "Concavity: resources are specialized, so OC rises."
+        - "Points: inside = inefficiency; on = productive efficiency; outside = currently unattainable."
+        - "Shifts vs movements: movements reallocate; shifts change capacity (resources/technology)."
       tok_insight: |
-        **Perspective:** Does an outward shift always mean everyone is better off? Think equity vs efficiency; growth may change the size, not necessarily the distribution, of the pie.
+        Perspective: Does an outward shift always mean everyone is better off? Think equity vs efficiency; growth changes size, not necessarily distribution, of the pie.
       worked_examples:
         - title: "Identify opportunity cost on a PPC"
           steps:
-            - "Start at point B (6 of A, ~3.2 of B)."
-            - "Move to point C (8 of A, ~1.8 of B)."
-            - "Compute the loss in Good B and the gain in Good A."
+            - "Start at point B (6 of A, about 3.2 of B)."
+            - "Move to point C (8 of A, about 1.8 of B)."
+            - "Compute the loss in B and the gain in A."
           notes:
-            - "Use absolute changes (ΔA, ΔB)."
-            - "Phrase the opportunity cost as 'giving up … to gain …'."
-          solution: "Moving from B to C: +2 units of Good A costs ≈−1.4 units of Good B; OC of each extra A ≈ 0.7 B."
+            - "Use absolute changes (delta A, delta B)."
+            - "State OC as giving up X to gain Y."
+          solution: "B to C: +2 A costs about 1.4 B; OC per extra A is about 0.7 B."
         - title: "Shift due to technology"
           steps:
-            - "Assume a tech improvement in Good A only."
-            - "Visualize a pivot—A‑intercept increases, B‑intercept unchanged."
-            - "Explain effect on attainable set and trade‑offs."
+            - "Assume tech improvement in Good A only."
+            - "Visualize a pivot: A-intercept increases, B-intercept unchanged."
+            - "Explain effect on attainable set and trade-offs."
           notes:
-            - "Partial (biased) outward shift indicates sector‑specific productivity."
-          solution: "The PPC pivots outward around the B‑intercept; more A can be produced at any level, increasing the choice set."
+            - "Biased outward shift indicates sector-specific productivity."
+          solution: "The PPC pivots outward around the B-intercept; more A can be produced at any level."
       misconceptions:
-        - "Outward shift always benefits everyone equally (distribution may vary)."
-        - "Any point outside is 'inefficient'—it is unattainable, not inefficient."
+        - "Outward shift benefits everyone equally."
+        - "Any point outside is inefficient (it is unattainable)."
       command_terms:
-        - term: Define
-          definition: "Give the precise meaning of a word/phrase."
-          mini_frame: "State definition in 1–2 lines; avoid examples."
-        - term: Explain
+        - term: "Define"
+          definition: "Give the precise meaning of a word or phrase."
+          mini_frame: "State definition in 1–2 lines."
+        - term: "Explain"
           definition: "Give a detailed account including reasons or causes."
-          mini_frame: "Cause → Mechanism → Effect."
-        - term: Evaluate
-          definition: "Make an appraisal by weighing strengths and limitations."
-          mini_frame: "Criteria → Pros/Cons → Judgement."
+          mini_frame: "Cause → mechanism → effect."
+        - term: "Evaluate"
+          definition: "Weigh strengths and limitations; then judge."
+          mini_frame: "Criteria → pros/cons → judgement."
       short_questions:
         - question: "Define opportunity cost using a PPC example."
           hint_chain:
-            - "What do you give up when you choose one point over another?"
-            - "Compute Δ in the other good when moving along the curve."
-          model_answer: "Opportunity cost is the good forgone when choosing another combination; e.g., moving from (6A,~3.2B) to (8A,~1.8B) costs ≈1.4B."
+            - "What do you give up when moving between two points?"
+            - "Compute the change in the other good."
+          model_answer: "Moving from (6A,3.2B) to (8A,1.8B) costs about 1.4B."
         - question: "What does a point inside the PPC indicate?"
           hint_chain:
             - "Think employment of resources."
-            - "Is output maximized for given inputs?"
-          model_answer: "Inefficiency/unemployment—economy can increase output of at least one good without sacrificing the other."
+          model_answer: "Inefficiency or unemployment."
         - question: "Why is the PPC usually concave to the origin?"
           hint_chain:
             - "Are resources equally adaptable?"
-            - "Think increasing marginal opportunity cost."
-          model_answer: "Because resources are specialized, reallocating them raises the OC of additional units, making the curve concave."
+          model_answer: "Specialization means rising OC, hence a bowed-out curve."
       extended_questions:
         - question: "Evaluate the impact of immigration on a country's PPC in the short and long run."
           planning_scaffold:
-            - "Identify which FoP changes."
-            - "Short‑run vs long‑run capacity and productivity."
-            - "Winners/losers and distributional effects."
-            - "Conclude with justified judgement."
-          criteria: "AO3 Evaluate: criteria + balanced analysis + reasoned conclusion."
-          model_answer: "Immigration increases labour, shifting PPC outward; short‑run pressures may limit gains; long‑run human capital can raise productivity. Distribution depends on sectoral demand/policy."
+            - "Which factor of production changes?"
+            - "Short-run vs long-run effects."
+            - "Distributional effects."
+            - "Conclude with judgement."
+          criteria: "AO3 Evaluate"
+          model_answer: "Immigration increases labour, shifting PPC outward; long-run human capital can raise productivity; distribution depends on sector and policy."
         - question: "To what extent does technological change eliminate scarcity?"
           planning_scaffold:
-            - "Differentiate shift vs movement along PPC."
-            - "Consider absolute vs relative scarcity."
-            - "Environmental/resource constraints."
-          criteria: "AO3 Evaluate."
-          model_answer: "Tech shifts PPC outward but scarcity persists due to unlimited wants and finite resources; composition effects and externalities matter."
+            - "Shift vs movement along PPC."
+            - "Absolute vs relative scarcity."
+            - "Environmental constraints."
+          criteria: "AO3 Evaluate"
+          model_answer: "Tech shifts PPC outward but scarcity persists due to unlimited wants and finite resources."
       mcqs:
-        - question: "A point outside the PPC represents …"
-          options: {A: "unattainable with current resources", B: "productive efficiency", C: "allocative efficiency", D: "underutilization"}
-          answer: A
-          rationales: {A: "Correct: beyond current capacity.", B: "Efficiency is on the curve.", C: "Allocative efficiency needs preferences; not implied.", D: "Inside, not outside."}
-        - question: "If all resources become unemployed, the economy moves …"
-          options: {A: "along the PPC", B: "inside the PPC", C: "outside the PPC", D: "the PPC pivots outward"}
-          answer: B
-          rationales: {A: "Movement along keeps efficiency.", B: "Correct: inefficiency.", C: "Still unattainable.", D: "Unemployment doesn't change capacity."}
-        - question: "A biased tech improvement in Good A causes the PPC to …"
-          options: {A: "shift inward", B: "pivot outward on B‑axis", C: "shift parallel outward", D: "not change"}
-          answer: B
-          rationales: {A: "Improvement increases capacity.", B: "Correct: A‑intercept increases.", C: "Parallel shift implies neutral tech.", D: "Tech does change it."}
-        - question: "Opportunity cost from moving from X to Y is measured by …"
-          options: {A: "loss of Good A", B: "gain in Good B", C: "loss of the alternative good", D: "sum of both goods"}
-          answer: C
-          rationales: {A: "Depends on direction.", B: "Wrong direction.", C: "Correct: what you give up.", D: "Not how OC is defined."}
+        - question: "A point outside the PPC represents…"
+          options:
+            A: "Unattainable with current resources."
+            B: "Productive efficiency."
+            C: "Allocative efficiency."
+            D: "Underutilization."
+          answer: "A"
+          rationales:
+            A: "Beyond current capacity."
+            B: "Efficiency is on the curve."
+            C: "Needs preferences; not implied."
+            D: "Inside the curve."
+        - question: "If all resources become unemployed, the economy moves…"
+          options:
+            A: "Along the PPC."
+            B: "Inside the PPC."
+            C: "Outside the PPC."
+            D: "The PPC pivots outward."
+          answer: "B"
+          rationales:
+            A: "Movement along means still efficient."
+            B: "Correct: inefficiency."
+            C: "Still unattainable."
+            D: "Unemployment does not change capacity."
+        - question: "A biased tech improvement in Good A causes the PPC to…"
+          options:
+            A: "Shift inward."
+            B: "Pivot outward on the B-axis."
+            C: "Shift parallel outward."
+            D: "Not change."
+          answer: "B"
+          rationales:
+            A: "Improvement increases capacity."
+            B: "A-intercept increases; pivot around B-intercept."
+            C: "Parallel shift implies neutral tech."
+            D: "Tech does change it."
+        - question: "Opportunity cost from moving from X to Y is measured by…"
+          options:
+            A: "Loss of Good A."
+            B: "Gain in Good B."
+            C: "Loss of the alternative good."
+            D: "Sum of both goods."
+          answer: "C"
+          rationales:
+            A: "Depends on direction."
+            B: "Wrong direction."
+            C: "Correct: what you give up."
+            D: "Not how OC is defined."
         - question: "Which statement is true?"
-          options: {A: "All points on PPC are allocatively efficient", B: "All points on PPC are productively efficient", C: "Points inside are unattainable", D: "Points outside are inefficient"}
-          answer: B
-          rationales: {A: "Allocative depends on preferences.", B: "Correct by definition.", C: "Inside are attainable but inefficient.", D: "Outside are unattainable."}
-        - question: "An outward parallel shift most likely results from …"
-          options: {A: "increase in labour only", B: "neutral technological progress", C: "reallocation of resources", D: "higher unemployment"}
-          answer: B
-          rationales: {A: "Biased to labour‑intensive good, not parallel.", B: "Correct: raises productivity in both goods.", C: "Movement along, not shift.", D: "Moves inside, not shift."}
+          options:
+            A: "All points on the PPC are allocatively efficient."
+            B: "All points on the PPC are productively efficient."
+            C: "Points inside are unattainable."
+            D: "Points outside are inefficient."
+          answer: "B"
+          rationales:
+            A: "Allocative depends on preferences."
+            B: "Correct by definition."
+            C: "Inside are attainable but inefficient."
+            D: "Outside are unattainable."
+        - question: "An outward parallel shift most likely results from…"
+          options:
+            A: "Increase in labour only."
+            B: "Neutral technological progress."
+            C: "Reallocation of resources."
+            D: "Higher unemployment."
+          answer: "B"
+          rationales:
+            A: "Likely a pivot toward labour-intensive good."
+            B: "Raises productivity in both goods."
+            C: "Movement along, not a shift."
+            D: "Moves inside, not a shift."
+
+       
+            
+          
+          
+       
+        
+           
