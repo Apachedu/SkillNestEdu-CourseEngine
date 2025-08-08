@@ -13,24 +13,26 @@ Business Management:
       explanation:
         - "Businesses coordinate resources to create value."
         - "Ownership forms affect liability, control, and finance."
+      textbook_pointers:
+        - "IB BM: Unit 1.2 Types of organization (overview)."
       misconceptions:
-        - "Non-profits do not make any surplus (they can, but reinvest)."
+        - "Non-profits do not make any surplus (they can, but reinvest surpluses)."
       command_terms:
         - term: Compare
           definition: "Give an account of similarities and differences."
           mini_frame: "Similarities → Differences → Mini-conclusion."
       short_questions:
-        - question: "List three ownership forms and one feature each."
+        - question: "List three ownership forms and one feature of each."
           hint_chain:
             - "Think liability and control."
           model_answer: "Sole trader (unlimited liability), Partnership (shared control), Corporation (limited liability)."
       extended_questions:
         - question: "Discuss whether social enterprises can be as financially sustainable as for-profits."
           planning_scaffold:
-            - "Define sustainability"
-            - "Revenue models"
-            - "Cost structures"
-            - "Impact measurement"
+            - "Define sustainability."
+            - "Revenue models."
+            - "Cost structures."
+            - "Impact measurement."
           criteria: "AO3 Discuss"
           model_answer: "Under certain models (hybrids, cross-subsidy) they can; depends on market, governance, and funding."
       mcqs:
@@ -47,13 +49,29 @@ Business Management:
             C: "Correct."
             D: "General partners have unlimited liability."
       exit_ticket:
-        - "Define stakeholder in one line."
+        - "Define 'stakeholder' in one line."
       ia_scaffold:
         - "Design stakeholder interview questions."
       ee_scaffold:
         - "Build a case study framework for governance analysis."
       teacher_notes:
+        pacing: "35–45 min"
+        lecture_script:
+          - "Hook: example of a local non-profit vs a private firm."
+          - "Define aims: profit, survival, growth, social mission."
+          - "Ownership forms: sole trader, partnership, corporation; liability and control."
+          - "Introduce social enterprises and hybrid models."
+        socratic_prompts:
+          - "Can a non-profit go bankrupt? Why?"
+          - "Does limited liability change behaviour of owners?"
+        board_plan:
+          - "Table: Structure | Liability | Control | Finance."
+          - "Venn: Profit vs Non-profit (overlaps)."
+        live_checks:
+          - "Cold-call: define limited liability."
+          - "Think-pair-share: pros/cons of incorporation."
         talking_points:
-          - "Clarify liability vs control."
+          - "Clarify difference between purpose (mission) and profit distribution."
+          - "Use real examples students know."
         sample_answers:
-          - "MCQ rationale examples as above."
+          - "Stakeholder: any person or group affected by an organization's decisions (e.g., employees, customers, community)."
