@@ -358,45 +358,69 @@ def learn_mode(CONFIG: dict, subject: str, level: str, topic: str, subtopic: str
     entry = CONFIG[subject][topic][subtopic or "Overview"]
     st.markdown(f"## 📘 {level} - {topic}{': ' + subtopic if subtopic else ''}")
 
-    steps = [
-        ("Objectives", lambda: render_objectives(entry.get("learning_objectives", []), entry.get("time_estimate"))),
-        ("Recap", lambda: render_prereq(entry.get("prereq_recap", []))),
-        ("Explain", lambda: render_explanation(entry.get("explanation", []))),
-        ("Textbook pointers", lambda: render_textbook_pointers(entry.get("textbook_pointers"))),
-        ("Interactive Diagram", lambda: render_diagram_step(entry)),
-        ("Examples", lambda: render_worked_examples(entry.get("worked_examples", []))),
-        ("Misconceptions", lambda: render_misconceptions(entry.get("misconceptions", []))),
-        ("Command Terms", lambda: render_command_terms(entry.get("command_terms", []))),
-        ("Glossary", lambda: render_glossary(entry.get("glossary", {}))),
-        ("TOK", lambda: render_tok(entry.get("tok_insight", ""))),
-        ("Practice (MCQ)", lambda: render_mcqs(entry.get("mcqs", []), subject=subject, topic=topic, subtopic=subtopic)),
-        ("Short Questions", lambda: render_short_questions(entry.get("short_questions", []), teacher_mode)),
-        ("Extended", lambda: render_extended_questions(entry.get("extended_questions", []), teacher_mode)),
-        ("Exit Ticket", lambda: render_exit_ticket(entry.get("exit_ticket", []))),
-        ("IA/EE", lambda: render_ia_ee(entry)),
-        ("Teacher Notes", lambda: render_teacher_notes(entry.get("teacher_notes", {})) if teacher_mode else None),
-    ]
+    # Build the step list cleanly (no duplicates). Include a step only if it has content.
+    steps: List[tuple[str, callable]] = []
 
+    steps.append(("Objectives", lambda: render_objectives(entry.get("learning_objectives", []), entry.get("time_estimate"))))
+    if entry.get("prereq_recap"):
+        steps.append(("Recap", lambda: render_prereq(entry.get("prereq_recap", []))))
+    if entry.get("explanation"):
+        steps.append(("Explain", lambda: render_explanation(entry.get("explanation", []))))
+    if entry.get("textbook_pointers"):
+        steps.append(("Textbook pointers", lambda: render_textbook_pointers(entry.get("textbook_pointers"))))
+    if entry.get("diagram"):
+        steps.append(("Interactive Diagram", lambda: render_diagram_step(entry)))
+    if entry.get("worked_examples"):
+        steps.append(("Examples", lambda: render_worked_examples(entry.get("worked_examples", []))))
+    if entry.get("misconceptions"):
+        steps.append(("Misconceptions", lambda: render_misconceptions(entry.get("misconceptions", []))))
+    if entry.get("command_terms"):
+        steps.append(("Command Terms", lambda: render_command_terms(entry.get("command_terms", []))))
+    if entry.get("glossary"):
+        steps.append(("Glossary", lambda: render_glossary(entry.get("glossary", {}))))
+    if entry.get("tok_insight"):
+        steps.append(("TOK", lambda: render_tok(entry.get("tok_insight", ""))))
+    if entry.get("mcqs"):
+        steps.append(("Practice (MCQ)", lambda: render_mcqs(entry.get("mcqs", []), subject=subject, topic=topic, subtopic=subtopic)))
+    if entry.get("short_questions"):
+        steps.append(("Short Questions", lambda: render_short_questions(entry.get("short_questions", []), teacher_mode)))
+    if entry.get("extended_questions"):
+        steps.append(("Extended", lambda: render_extended_questions(entry.get("extended_questions", []), teacher_mode)))
+    if entry.get("exit_ticket"):
+        steps.append(("Exit Ticket", lambda: render_exit_ticket(entry.get("exit_ticket", []))))
+    if entry.get("ia_scaffold") or entry.get("ee_scaffold"):
+        steps.append(("IA/EE", lambda: render_ia_ee(entry)))
+    if teacher_mode and entry.get("teacher_notes"):
+        steps.append(("Teacher Notes", lambda: render_teacher_notes(entry.get("teacher_notes", {}))))
+
+    # Navigation state
     key = f"step_{subject}_{topic}_{subtopic or 'Overview'}"
     if key not in st.session_state:
         st.session_state[key] = 0
     idx = st.session_state[key]
+    idx = max(0, min(idx, len(steps) - 1))
 
-    st.progress((idx + 1) / max(1, len(steps)))
-    st.caption(f"Step {idx + 1} of {len(steps)} — {steps[idx][0]}")
-    steps[idx][1]()
+    # Progress + render
+    if steps:
+        st.progress((idx + 1) / len(steps))
+        st.caption(f"Step {idx + 1} of {len(steps)} — {steps[idx][0]}")
+        steps[idx][1]()
+    else:
+        st.info("No content for this subtopic yet.")
 
+    # Nav buttons
     col_prev, col_next = st.columns(2)
     with col_prev:
         if st.button("⬅️ Back", key=f"back_{key}_{idx}", disabled=idx == 0):
             st.session_state[key] = max(0, idx - 1)
             st.rerun()
     with col_next:
-        if st.button("Next ➡️", key=f"next_{key}_{idx}", disabled=idx == len(steps) - 1):
+        if st.button("Next ➡️", key=f"next_{key}_{idx}", disabled=idx >= len(steps) - 1):
             st.session_state[key] = min(len(steps) - 1, idx + 1)
             st.rerun()
 
 # ───────────────── UI ─────────────────
+
 
 st.title("📘 SkillNestEdu Course Engine")
 st.subheader("Your AI-powered self-study lesson builder")
