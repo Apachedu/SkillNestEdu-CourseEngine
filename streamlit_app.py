@@ -52,6 +52,7 @@ def ordered_keys(d: dict, order_key: str = "_order") -> list:
 
 # ───────────────── Page config ─────────────────
 st.set_page_config(
+    st.warning("INLINE YAML LOADER ACTIVE")
     page_title="SkillNestEdu Course Engine",
     page_icon="📘",
     layout="centered",
