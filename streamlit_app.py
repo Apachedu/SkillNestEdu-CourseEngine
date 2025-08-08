@@ -775,12 +775,16 @@ if teacher_toggle:
 else:
     st.session_state["teacher_ok"] = False
 
-if st.button("Start Learn Mode ▶️"):
-    learn_mode(subject, level, topic, sub, teacher_mode)
+# Start Learn Mode: set active signature in session state, render exactly once per run
+signature = f"{subject}|{topic}|{sub or 'Overview'}"
+start_clicked = st.button("Start Learn Mode ▶️")
+if start_clicked:
+    st.session_state["learn_active"] = True
+    st.session_state["active_signature"] = signature
+    # reset step position when starting a new lesson
+    st.session_state[f"step_{subject}_{topic}_{sub or 'Overview'}"] = 0
 
-# Auto-render when already in session (after first click)
-key_active = f"step_{subject}_{topic}_{sub or 'Overview'}"
-if key_active in st.session_state:
+if st.session_state.get("learn_active") and st.session_state.get("active_signature") == signature:
     learn_mode(subject, level, topic, sub, teacher_mode)
 
 # Optional debug (hidden unless DEV_MODE is enabled)
