@@ -52,7 +52,6 @@ def ordered_keys(d: dict, order_key: str = "_order") -> list:
 
 # ───────────────── Page config ─────────────────
 st.set_page_config(
-    st.warning("INLINE YAML LOADER ACTIVE")
     page_title="SkillNestEdu Course Engine",
     page_icon="📘",
     layout="centered",
@@ -564,3 +563,4 @@ else:
 
     if st.session_state.get("learn_active") and st.session_state.get("active_signature") == selection_signature:
         learn_mode(CONFIG, subject, level, topic, sub, teacher_mode)
+
