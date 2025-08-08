@@ -56,6 +56,18 @@ def _get_google_creds():
     return service_account.Credentials.from_service_account_info(info, scopes=SCOPES)
 
 
+# Helper: Teacher password from secrets/env
+
+def _get_teacher_pass() -> str | None:
+    """Return teacher password from Streamlit secrets or env var TEACHER_PASS.
+    If not set, returns None.
+    """
+    try:
+        val = st.secrets.get("TEACHER_PASS")  # None if missing
+    except Exception:
+        val = None
+    return val or os.environ.get("TEACHER_PASS")
+
 # Optional: Google Docs helpers (not required for current UI)
 DOCUMENT_ID = "1NOykWSpT31a2vbwlPQRIjAAexqpeOi1UQcBAP6t-pgU"
 
@@ -744,7 +756,24 @@ subs = list(CONFIG[subject][topic].keys())
 subtopic = st.selectbox("Choose Subtopic", ["Overview"] + [s for s in subs if s != "Overview"])  # Overview default
 sub = subtopic if subtopic != "Overview" else None
 
-teacher_mode = st.checkbox("Teacher View (show model answers & notes)")
+# 🔒 Password-gated Teacher View
+teacher_toggle = st.checkbox("🔒 Teacher View (password required)")
+teacher_mode = False
+if teacher_toggle:
+    if not st.session_state.get("teacher_ok", False):
+        pw = st.text_input("Enter teacher password", type="password", key="teacher_pw")
+        if st.button("Unlock", type="primary"):
+            expected = _get_teacher_pass()
+            if not expected:
+                st.warning("Teacher password is not set. Ask admin to set TEACHER_PASS in Streamlit Secrets.")
+            elif pw == expected:
+                st.session_state["teacher_ok"] = True
+                st.success("Teacher View unlocked for this session.")
+            else:
+                st.error("Incorrect password.")
+    teacher_mode = st.session_state.get("teacher_ok", False)
+else:
+    st.session_state["teacher_ok"] = False
 
 if st.button("Start Learn Mode ▶️"):
     learn_mode(subject, level, topic, sub, teacher_mode)
