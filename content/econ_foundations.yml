@@ -173,6 +173,30 @@ Economics:
         - "**Shifts vs movements**: movements = reallocation; shifts = capacity change (resources/technology)."
       tok_insight: |
         **Perspective:** Does an outward shift always mean everyone is better off? Think equity vs efficiency; growth may change the size, not necessarily the distribution, of the pie.
+          visuals:
+      - src: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/PPF_expansion.svg/1024px-PPF_expansion.svg.png"
+        caption: "Outward shift of the PPC (growth)"
+      - src: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bb/Production_Possibility_Frontier.svg/1024px-Production_Possibility_Frontier.svg.png"
+        caption: "Baseline PPC with axes"
+
+    teacher_notes:
+      pacing: "45–55 min"
+      lecture_script:
+        - "Warm-up: scarcity vs shortage → choices."
+        - "Define PPC assumptions (fixed resources/tech)."
+        - "Inside/on/outside; productive vs allocative efficiency."
+        - "Slider demo: outward shift; causes & who gains."
+      socratic_prompts:
+        - "If tech improves only in Good A, how does the frontier change?"
+        - "Does growth remove scarcity? Why/why not?"
+      board_plan:
+        - "Draw base PPC with A,B,C; annotate OC on B→C."
+        - "Show pivot vs parallel shift sketches."
+      live_checks:
+        - "Thumbs: Inside vs On vs Outside?"
+        - "1-min write: define OC using B→C."
+      sample_answers:
+        - "Inside = inefficiency/unemployment; On = productive efficiency; Outside = unattainable."    
       worked_examples:
         - title: "Identify opportunity cost on a PPC"
           steps:
