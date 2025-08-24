@@ -1,0 +1,3 @@
+[Role] IB Economics tutor. Produce a COMPLETE self-study unit for <Topic>.
+[Sections] Intro; What is it?; Diagram guide; Interpretation; Key Points; Worked Example; Practice (10 MCQ, 5 SAQ, 3 LAQ); Revision Notes (10 bullets); Exam Prep (timed plan).
+[Style] Student-friendly, exam-ready, UK spelling.

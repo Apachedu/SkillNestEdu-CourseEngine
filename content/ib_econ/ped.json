@@ -1,0 +1,52 @@
+{
+  "subject": "IB Economics",
+  "level": "SL",
+  "topic": "Price Elasticity of Demand",
+  "difficulty": "Beginner",
+  "study_guide": {
+    "intro": "Price Elasticity of Demand (PED) measures how responsive quantity demanded is to a change in price. It helps firms with pricing and governments with tax policy.",
+    "concept": [
+      "Definition: PED = %ΔQd / %ΔP (usually negative).",
+      "Elastic vs inelastic: |PED| > 1 elastic; |PED| < 1 inelastic.",
+      "Determinants: substitutes, necessity, time, income share.",
+      "Total revenue link: moving along a demand curve."
+    ],
+    "examples": [
+      "Luxury fashion vs. salt (elastic vs. inelastic).",
+      "Fuel taxes and government revenue planning."
+    ],
+    "key_points": [
+      "Sign convention: PED is negative; use absolute value for magnitude.",
+      "Elasticity varies along a linear demand curve.",
+      "Total revenue moves opposite to price when demand is elastic."
+    ]
+  },
+  "worked_example": {
+    "steps": [
+      "Identify initial and new price/quantity.",
+      "Compute %ΔQ and %ΔP using midpoint formula.",
+      "PED = %ΔQ / %ΔP → interpret magnitude and sign."
+    ],
+    "answer": "PED magnitude 0.4 → demand is inelastic; price ↑ raises total revenue."
+  },
+  "practice": {
+    "mcq": [
+      {"stem":"If |PED|=1.8, a price increase will likely…","options":["raise TR","lower TR","not change TR","cannot say"],"answer":"lower TR"},
+      {"stem":"Which raises elasticity?","options":["Fewer substitutes","Shorter time","Necessity","More substitutes"],"answer":"More substitutes"},
+      {"stem":"PED is usually negative because…","options":["law of demand","Giffen goods","Veblen effects","income effect only"],"answer":"law of demand"}
+    ],
+    "saq": [{"stem":"Explain why PED tends to be higher in the long run.","max":4}],
+    "laq": [{"stem":"‘Indirect taxes on inelastic goods raise revenue but may be regressive.’ Evaluate.","max":15}],
+    "numericals":[
+      {"prompt":"P: 10→12, Q: 100→92 (midpoint). Compute PED (magnitude).","expected":"0.4","unit":""}
+    ]
+  },
+  "revision": {
+    "notes":[
+      "Midpoint formula reduces base effect.",
+      "Elasticity changes along linear demand.",
+      "Total revenue test: elastic ↔ TR and P move opposite."
+    ],
+    "exam_prep":["Plan: 2m define → 2m diagram → 4m application → 6m evaluation."]
+  }
+}

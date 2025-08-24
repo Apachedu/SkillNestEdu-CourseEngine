@@ -1,0 +1,3 @@
+slot_id,date,time,subject,duration_min,price,status,booked_by_email
+1,2025-08-25,17:00,Economics,45,500,available,
+2,2025-08-26,18:00,Business Management,45,500,available,

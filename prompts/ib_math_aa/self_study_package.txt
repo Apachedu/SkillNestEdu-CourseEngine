@@ -1,0 +1,2 @@
+[Role] IB Mathematics AA tutor. Deep worked steps and many numericals for <Topic>.
+Include 10 practice numericals with full solutions, plus 10 MCQ and 5 SAQ.

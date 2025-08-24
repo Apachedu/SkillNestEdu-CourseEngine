@@ -1,0 +1,47 @@
+{
+  "subject":"IB Math AA",
+  "level":"SL",
+  "topic":"Quadratic Functions — Basics",
+  "study_guide":{
+    "intro":"Quadratics model parabolic relationships: y=ax^2+bx+c.",
+    "concept":[
+      "Forms: standard (ax^2+bx+c), vertex a(x-h)^2+k, factored a(x-r1)(x-r2).",
+      "Vertex: (-b/2a, f(-b/2a)); axis of symmetry x=-b/2a.",
+      "Discriminant Δ=b^2-4ac → roots behaviour."
+    ],
+    "examples":[
+      "Maximum area problems.",
+      "Projectile motion (ignoring air resistance)."
+    ],
+    "key_points":[
+      "Sign of a controls opening and concavity.",
+      "Δ>0 two roots; Δ=0 one root; Δ<0 complex roots."
+    ]
+  },
+  "worked_example":{
+    "steps":[
+      "Given y=2x^2-8x+3, compute vertex x=-b/2a=8/4=2.",
+      "Vertex y=2(2)^2-8(2)+3=8-16+3=-5 → (2,-5).",
+      "Discriminant Δ=b^2-4ac=64-24=40 → two real roots.",
+      "Roots via quadratic formula x=(8±√40)/4 = (4±√10)/2."
+    ],
+    "answer":"Vertex (2,-5); two real roots (4±√10)/2."
+  },
+  "practice":{
+    "mcq":[
+      {"stem":"For y=-x^2+6x-5, the parabola opens…","options":["up","down","sideways","cannot say"],"answer":"down"}
+    ],
+    "saq":[{"stem":"Find the axis of symmetry and vertex for y=3x^2+6x+1.","max":4}],
+    "laq":[{"stem":"Explain how the discriminant informs the nature of roots and sketch implications.","max":10}],
+    "numericals":[
+      {"prompt":"For y=x^2-4x+3, compute Δ and the roots.","expected":"1 and roots 1,3","unit":""}
+    ]
+  },
+  "revision":{
+    "notes":[
+      "Complete the square to get vertex form.",
+      "Δ<0 → no real x-intercepts."
+    ],
+    "exam_prep":["Sketch → features → solve → interpret."]
+  }
+}

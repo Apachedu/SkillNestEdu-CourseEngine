@@ -1,9 +1,7 @@
 __pycache__/
 *.pyc
-.venv/
+*.sqlite
 .env
-.DS_Store
-.ipynb_checkpoints/
 .streamlit/secrets.toml
-credentials.json
-topics.json
+.data/
+.license/*.json

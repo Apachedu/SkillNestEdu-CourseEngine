@@ -1,6 +1,7 @@
 streamlit
 plotly
+sympy
+pint
 numpy
-google-auth
-google-api-python-client
-PyYAML
+pandas
+pillow

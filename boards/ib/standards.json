@@ -1,0 +1,5 @@
+{
+  "paper_map": { "short_answer_marks": [2,4], "long_answer_marks": [10,15,20], "numericals": false },
+  "command_terms": ["define","explain","analyse","evaluate","discuss"],
+  "expiry": "2026-05-31"
+}
