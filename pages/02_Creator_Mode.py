@@ -1,22 +1,39 @@
 import streamlit as st
 from ui_branding import sidebar_branding, page_watermark
 from engine_v2 import generate_package
-from utils.auth import get_license_info
 
 st.set_page_config(page_title="SkillNestEdu — Creator Mode", layout="wide")
 
-if "auth_email" not in st.session_state:
-    st.warning("Please login first (Pages ➜ Login)."); st.stop()
+# ------- Admin guard -------
+role = st.session_state.get("auth_role")
+if role != "admin":
+    st.error("Admins only. Please login as **Admin** (Pages ➜ Login).")
+    st.stop()
 
-auth_email = st.session_state["auth_email"]
-auth_board = st.session_state.get("auth_board", "IB")
-lic_email, boards, expiry = get_license_info()
-sidebar_branding(lic_email, auth_board, expiry); page_watermark(lic_email, expiry)
+# ------- Header status + logout -------
+def logout():
+    for k in [k for k in st.session_state.keys() if k.startswith("auth_")]:
+        st.session_state.pop(k, None)
+    try:
+        st.rerun()
+    except Exception:
+        st.experimental_rerun()
 
+with st.container(border=True):
+    st.write(f"🔐 Logged in as **{st.session_state.get('auth_email','?')}** "
+             f"• Role: **{st.session_state.get('auth_role','?').replace('_',' ').title()}**")
+    st.button("Logout", on_click=logout)
+
+# ------- Sidebar branding -------
+EMAIL = st.session_state.get("auth_email", "admin@skillnestedu.com")
+sidebar_branding(EMAIL, "All Boards", None)
+page_watermark(EMAIL, None)
+
+# ------- Admin tools -------
 st.title("Creator Mode")
 subject = st.selectbox("Subject", ["IB Economics","IB Math AA"])
 level = st.selectbox("Level", ["SL","HL"])
-topic = st.text_input("Topic", value="Price Elasticity of Demand")
+topic = st.text_input("Topic")
 
 if st.button("Generate"):
     pkg = generate_package(subject, level, "IB", topic)
