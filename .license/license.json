@@ -2,35 +2,55 @@
   "admin": {
     "email": "admin@skillnestedu.com",
     "salt": "skillnest-salt-v1",
-    "password_hash": "HASH_FOR_ARUSHI13",
+    "password_hash": "8c04f2ab08ace0cf45588db4e6e44a8934af70b316a98f4b34c23ff54e0c98a7",
     "expiry": "2026-05-31"
   },
-  "student_ib": { ... },
-  "student_cbse": { ... },
-  "student_icse": { ... },
-  "student_ug": { ... },
+  "student_ib": {
+    "email": "ib_student@skillnestedu.com",
+    "salt": "skillnest-salt-v1",
+    "password_hash": "27cd514effe275e3d058bf300095ad2cfe4222d04f480273743020bce5d545a3",
+    "expiry": "2027-05-31"
+  },
+  "student_cbse": {
+    "email": "cbse_student@skillnestedu.com",
+    "salt": "skillnest-salt-v1",
+    "password_hash": "7ea84717eef8391287153410f9b1b97548b0fe030528f22c4ea62df5e1fbf591",
+    "expiry": "2026-05-31"
+  },
+  "student_icse": {
+    "email": "icse_student@skillnestedu.com",
+    "salt": "skillnest-salt-v1",
+    "password_hash": "3e9467e7eeed01a7b7850d0a19f5e45d4ea37d88dbfbb05be82083dfd3563279",
+    "expiry": "2026-05-31"
+  },
+  "student_ug": {
+    "email": "ug_student@skillnestedu.com",
+    "salt": "skillnest-salt-v1",
+    "password_hash": "dc2196cb4c6a43ea6b45a85e39e05eb5f16e0f85b2a367528c7a4c54f37f50b0",
+    "expiry": "2026-05-31"
+  },
   "student_ielts": {
     "email": "ielts_student@skillnestedu.com",
     "salt": "skillnest-salt-v1",
-    "password_hash": "HASH_FOR_IELTS_PASSWORD",
+    "password_hash": "ee63bbd6c314d5b8ad6de3aee6f52ecf42b0f3bca772191360d19c2dfd708fc4",
     "expiry": "2026-05-31"
   },
   "student_pte": {
     "email": "pte_student@skillnestedu.com",
     "salt": "skillnest-salt-v1",
-    "password_hash": "HASH_FOR_PTE_PASSWORD",
+    "password_hash": "3d9a3a02f2f3a594c6561ac36f2ef98c6f8590c4164e365bb2d5a20a8c2a9f08",
     "expiry": "2026-05-31"
   },
   "student_softskills": {
     "email": "softskills_student@skillnestedu.com",
     "salt": "skillnest-salt-v1",
-    "password_hash": "HASH_FOR_SOFTSKILLS_PASSWORD",
+    "password_hash": "7f3b86d9d2c2d41fcae2748e44736cf690bdba9a4d9eac484d0d2b2b44c90c93",
     "expiry": "2026-05-31"
   },
   "student_spokenenglish": {
     "email": "spoken_student@skillnestedu.com",
     "salt": "skillnest-salt-v1",
-    "password_hash": "HASH_FOR_SPOKEN_PASSWORD",
+    "password_hash": "c04b4deff639b397e8c48b4e53b15e58f86f22cf30ef9ea31d70e55d2b02e1ee",
     "expiry": "2026-05-31"
   }
 }
