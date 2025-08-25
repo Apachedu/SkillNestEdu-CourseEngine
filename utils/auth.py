@@ -3,7 +3,6 @@ from typing import Tuple, Optional, List
 
 LICENSE_PATH = ".license/license.json"
 
-# ---- IO helpers ----
 def _read_json(path: str) -> dict:
     try:
         with open(path, "r") as f:
@@ -18,18 +17,16 @@ def _write_json(path: str, obj: dict) -> None:
 def _read_license() -> dict:
     return _read_json(LICENSE_PATH)
 
-# ---- Crypto ----
 def hash_password(salt: str, password: str) -> str:
     m = hashlib.sha256()
     m.update((salt + (password or "")).encode("utf-8"))
     return m.hexdigest()
 
-# ---- Roles (discovered from license) ----
+# ---- Discover roles from license (so you never edit code when adding courses) ----
 def get_roles() -> List[str]:
     lic = _read_license() or {}
     roles = list(lic.keys())
-    # put admin first if present
-    roles.sort(key=lambda r: (r != "admin", r))
+    roles.sort(key=lambda r: (r != "admin", r))  # admin first
     return roles
 
 def _board_label_for_role(role: str) -> str:
@@ -46,11 +43,7 @@ def _board_label_for_role(role: str) -> str:
     }
     return mapping.get(role, role.replace("_"," ").title())
 
-# ---- Public API ----
 def get_license_info(role: str) -> Tuple[str, str, str, Optional[str]]:
-    """
-    Returns (email, board_label, expiry, password_hash) for the selected role.
-    """
     lic = _read_license() or {}
     acc = lic.get(role, {})
     email = acc.get("email", f"{role}@example.com")
@@ -86,16 +79,11 @@ def verify_login(role: str, input_email: str, input_password: str) -> Tuple[bool
     return True, "Login successful."
 
 def set_password(role: str, new_password: str) -> Tuple[bool, str]:
-    """
-    Update password for a given role in .license/license.json.
-    (On Cloud, file writes won't persist after reboot—change locally and push.)
-    """
     if not new_password or len(new_password) < 6:
         return False, "Choose a password with at least 6 characters."
     lic = _read_license()
     if role not in lic:
         return False, f"Role '{role}' not found in license."
-
     salt = lic[role].get("salt", "skillnest-salt-v1")
     lic[role]["password_hash"] = hash_password(salt, new_password)
     try:
