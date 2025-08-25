@@ -1,29 +1,20 @@
 import datetime
+from frameworks.router import generate_auto_package
 
 def generate_package(subject:str, level:str, board:str, topic:str, difficulty:str="Beginner"):
-    """Stub generator—wire to Gamma API later."""
+    pkg = generate_auto_package(subject, level, board, topic, difficulty)
+    pkg["meta"]["generated_at"] = datetime.datetime.utcnow().isoformat()+"Z"
+    # Back-compat fields used by pages:
     return {
-        "meta": {
-            "subject": subject, "level": level, "board": board, "topic": topic,
-            "generated_at": datetime.datetime.utcnow().isoformat()+"Z"
-        },
+        "meta": pkg["meta"],
         "study_guide": {
-            "intro": f"{topic}: why it matters (2–3 lines).",
-            "concept": [f"Definition of {topic}.", "Key idea #1", "Key idea #2"],
-            "diagram_spec": {"hint": "axes/labels; add interactive later"},
-            "examples": ["Real-world example 1", "Real-world example 2"],
-            "key_points": ["Point A","Point B","Point C"]
+            "intro": f"{topic}: why it matters (auto).",
+            "concept": [b.get("text","") for b in pkg["lesson"].get("content",[])],
+            "diagram_spec": {"hint": "interactive diagrams coming here"},
+            "examples": ["Auto example 1","Auto example 2"],
+            "key_points": ["Key A","Key B","Key C"]
         },
-        "worked_example": {
-            "steps": ["Step 1","Step 2","Step 3"], "answer": "Final answer"
-        },
-        "practice": {
-            "mcq": [{"stem":"Sample MCQ?","options":["A","B","C","D"],"answer":"A"} for _ in range(5)],
-            "saq": [{"stem":"Explain … (4 marks)","max":4,"criteria":["accuracy","clarity","use_of_terms","examples"]}],
-            "laq": [{"stem":"Evaluate … (15 marks)","max":15,"criteria":["knowledge","analysis","evaluation","structure","terms"]}]
-        },
-        "revision": {
-            "notes": ["Rev note 1","Rev note 2","Rev note 3"],
-            "exam_prep": ["Plan: 10 min outline → 25 min write → 5 min check"]
-        }
+        "worked_example": {"steps": ["Step 1","Step 2","Step 3"], "answer": "Final answer"},
+        "practice": pkg["lesson"].get("practice", {"mcq": [], "saq": [], "laq": []}),
+        "revision": {"notes": ["Rev note 1","Rev note 2"], "exam_prep": ["10 min outline → 25 min write → 5 min check"]}
     }
