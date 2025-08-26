@@ -3,7 +3,7 @@ from utils.storage import log_booking
 
 st.set_page_config(page_title="SkillNestEdu — Booking", layout="wide")
 
-role = st.session_state.get("auth_role")
+role = st.session_state.get("role")
 if role not in ("admin", "student_ib", "student_cbse", "student_icse", "student_ug",
                 "student_ielts", "student_pte", "student_softskills", "student_spokenenglish"):
     st.warning("Please login first (Pages → Login)."); st.stop()

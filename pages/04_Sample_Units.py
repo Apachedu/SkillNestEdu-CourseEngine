@@ -4,7 +4,7 @@ from utils.auth import get_license_info
 
 st.set_page_config(page_title="SkillNestEdu — Sample Units", layout="wide")
 
-if "auth_email" not in st.session_state:
+if "email" not in st.session_state:
     st.warning("Please login first (Pages ➜ Login)."); st.stop()
 
 lic_email, boards, expiry = get_license_info()

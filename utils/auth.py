@@ -1,66 +1,53 @@
-import json, hashlib
-from typing import Tuple, Optional, List
+import os, json, hashlib
+from typing import Tuple, List, Optional
 
-LICENSE_PATH = ".license/license.json"
+try:
+    import streamlit as st  # type: ignore
+except Exception:
+    class _Dummy: secrets = {}
+    st = _Dummy()  # type: ignore
 
-def _read_json(path: str) -> dict:
+def _get_block(role: str) -> dict:
     try:
-        with open(path, "r") as f:
-            return json.load(f)
+        if hasattr(st, "secrets") and role in st.secrets:
+            return dict(st.secrets[role])
     except Exception:
-        return {}
+        pass
+    return {}
 
-def _write_json(path: str, obj: dict) -> None:
-    with open(path, "w") as f:
-        json.dump(obj, f, indent=2)
-
-def _read_license() -> dict:
-    return _read_json(LICENSE_PATH)
-
-def hash_password(salt: str, password: str) -> str:
-    m = hashlib.sha256()
-    m.update((salt + (password or "")).encode("utf-8"))
-    return m.hexdigest()
-
-# ---- Discover roles from license (so you never edit code when adding courses) ----
 def get_roles() -> List[str]:
-    lic = _read_license() or {}
-    roles = list(lic.keys())
-    roles.sort(key=lambda r: (r != "admin", r))  # admin first
-    return roles
+    roles = []
+    try:
+        for k in st.secrets.keys():
+            if k == "admin" or k.startswith("student_"):
+                roles.append(k)
+    except Exception:
+        pass
+    return sorted(roles)
 
-def _board_label_for_role(role: str) -> str:
-    mapping = {
-        "admin": "All Boards",
-        "student_ib": "IB",
-        "student_cbse": "CBSE",
-        "student_icse": "ICSE",
-        "student_ug": "UG",
-        "student_ielts": "IELTS",
-        "student_pte": "PTE",
-        "student_softskills": "Soft Skills",
-        "student_spokenenglish": "Spoken English",
-    }
-    return mapping.get(role, role.replace("_"," ").title())
-
-def get_license_info(role: str) -> Tuple[str, str, str, Optional[str]]:
-    lic = _read_license() or {}
-    acc = lic.get(role, {})
-    email = acc.get("email", f"{role}@example.com")
-    board_label = _board_label_for_role(role)
-    expiry = acc.get("expiry", "2026-05-31")
-    return email, board_label, expiry, acc.get("password_hash")
+def get_license_info(role: str = "admin") -> Tuple[str, List[str], Optional[int]]:
+    blk = _get_block(role) or {}
+    email = (blk.get("email") or "contact@skillnestedu.com")
+    boards = [blk.get("role") or role]
+    expiry = blk.get("expiry")
+    ts = None
+    if expiry:
+        try:
+            import datetime
+            ts = int(datetime.datetime.fromisoformat(expiry).timestamp())
+        except Exception:
+            ts = None
+    return email, boards, ts
 
 def verify_login(role: str, input_email: str, input_password: str) -> Tuple[bool, str]:
-    lic = _read_license()
-    if role not in lic:
-        return False, f"Role '{role}' not licensed. Ask admin to add it in .license/license.json."
-
-    acc = lic[role]
-    if (input_email or "").strip().lower() != (acc.get("email","") or "").lower():
-        return False, "Email not licensed for this role."
-
-    exp = acc.get("expiry")
+    blk = _get_block(role)
+    if not blk:
+        return False, f"Role [{role}] not configured."
+    email_in = (input_email or "").strip().lower()
+    email_ok = (blk.get("email") or "").strip().lower()
+    if email_in != email_ok:
+        return False, "Email not licensed."
+    exp = (blk.get("expiry") or "").strip()
     if exp:
         try:
             import datetime
@@ -68,26 +55,11 @@ def verify_login(role: str, input_email: str, input_password: str) -> Tuple[bool
                 return False, f"License expired on {exp}."
         except Exception:
             pass
-
-    salt = acc.get("salt", "skillnest-salt-v1")
-    expected = acc.get("password_hash", "")
+    salt = blk.get("salt", "skillnest-salt-v1")
+    expected = blk.get("password_hash") or ""
     if not expected:
-        return False, "Password not set for this role."
-    actual = hash_password(salt, input_password or "")
+        return False, "Password not set."
+    actual = hashlib.sha256((salt + (input_password or "").strip()).encode()).hexdigest()
     if actual != expected:
         return False, "Incorrect password."
     return True, "Login successful."
-
-def set_password(role: str, new_password: str) -> Tuple[bool, str]:
-    if not new_password or len(new_password) < 6:
-        return False, "Choose a password with at least 6 characters."
-    lic = _read_license()
-    if role not in lic:
-        return False, f"Role '{role}' not found in license."
-    salt = lic[role].get("salt", "skillnest-salt-v1")
-    lic[role]["password_hash"] = hash_password(salt, new_password)
-    try:
-        _write_json(LICENSE_PATH, lic)
-        return True, f"Password updated for role '{role}'."
-    except Exception as e:
-        return False, f"Write failed: {e}"

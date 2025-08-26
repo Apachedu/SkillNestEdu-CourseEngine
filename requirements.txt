@@ -5,3 +5,6 @@ pint
 numpy
 pandas
 pillow
+scikit-learn
+joblib
+PyMuPDF

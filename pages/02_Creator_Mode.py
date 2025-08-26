@@ -4,7 +4,7 @@ from engine_v2 import generate_package
 
 st.set_page_config(page_title="SkillNestEdu — Creator Mode", layout="wide")
 
-role = st.session_state.get("auth_role")
+role = st.session_state.get("role")
 if role != "admin":
     st.error("Admins only. Please login as Admin (Pages → Login)."); st.stop()
 
@@ -14,10 +14,10 @@ def logout():
     except Exception: st.experimental_rerun()
 
 with st.container(border=True):
-    st.write(f"🔐 Logged in as **{st.session_state.get('auth_email','?')}** • Role: **{st.session_state.get('auth_role','?').replace('_',' ').title()}**")
+    st.write(f"🔐 Logged in as **{st.session_state.get('email','?')}** • Role: **{st.session_state.get('role','?').replace('_',' ').title()}**")
     st.button("Logout", on_click=logout)
 
-EMAIL = st.session_state.get("auth_email", "admin@skillnestedu.com")
+EMAIL = st.session_state.get("email", "admin@skillnestedu.com")
 sidebar_branding(EMAIL, "All Boards", None); page_watermark(EMAIL, None)
 
 st.title("Creator Mode")
