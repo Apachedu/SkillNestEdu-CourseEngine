@@ -1,5 +1,13 @@
 import streamlit as st
 from utils.auth import verify_login
+import sys, os
+def logout_fix():
+    import streamlit as st
+    for k in [k for k in list(st.session_state.keys()) if k.startswith("auth_") or k in ("role","email","auth_board")]:
+        st.session_state.pop(k, None)
+    st.rerun()
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 st.set_page_config(page_title="Login", layout="centered")
 

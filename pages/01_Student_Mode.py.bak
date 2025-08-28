@@ -1,0 +1,254 @@
+# pages/01_Student_Mode.py
+import streamlit as st
+import sys, os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
+
+# App utilities (already in your repo)
+from ui_branding import sidebar_branding, page_watermark
+from engine_v2 import generate_package
+from utils.retrieval import search_snippets
+from utils.storage import log_attempt
+from utils.feedback import grade_mcq, grade_saq, grade_laq
+
+# Optional (exists in our repo for UG Finance index & diagrams)
+try:
+    from utils.catalog import load_finance_index  # loads data/finance/index.json
+except Exception:  # keep page working even if missing
+    def load_finance_index():
+        return {}
+
+try:
+    # this provides render_auto_ui(subject, topic) for diagrams
+    from diagrams import render_auto_ui  # type: ignore
+except Exception:
+    def render_auto_ui(subject: str, topic: str):
+        st.caption("Interactive diagrams will appear here once diagrams.py is present.")
+
+st.set_page_config(page_title="SkillNestEdu — Student Mode", layout="wide")
+
+# ---- Simple auth guard ----
+role = st.session_state.get("role")
+if role not in (
+    "admin",
+    "student_ib", "student_cbse", "student_icse", "student_ug",
+    "student_ielts", "student_pte", "student_softskills", "student_spokenenglish",
+):
+    st.warning("Please login first (Pages → Login).")
+    st.stop()
+
+
+# ---- Logout helper (safe inside button) ----
+def _do_logout():
+    for k in list(st.session_state.keys()):
+        if k.startswith("auth_") or k in ("email", "role", "auth_board"):
+            st.session_state.pop(k, None)
+
+
+# ---- Header / identity ----
+with st.container(border=True):
+    st.write(
+        f"🔐 Logged in as **{st.session_state.get('email','?')}** • "
+        f"Role: **{st.session_state.get('role','?').replace('_',' ').title()}** • "
+        f"Board: **{st.session_state.get('auth_board','—')}**"
+    )
+    if st.button("Logout"):
+        _do_logout()
+        st.experimental_rerun()
+
+EMAIL = st.session_state.get("email", "student@skillnestedu.com")
+BOARD_LABEL = st.session_state.get("auth_board", "IB")
+
+# Branding / watermark
+sidebar_branding(EMAIL, BOARD_LABEL, None)
+page_watermark(EMAIL, None)
+
+
+# =============================================================================
+# Sidebar controls (IB + UG Finance)
+# =============================================================================
+
+# First: Board
+board = st.sidebar.selectbox(
+    "Board",
+    ["IB", "UG", "CBSE", "ICSE", "IELTS", "PTE", "Soft Skills", "Spoken English"],
+    index=(0 if BOARD_LABEL not in (None, "", "—") else 0),
+)
+
+# Build the rest of the sidebar based on selected board
+subject = "IB Economics"
+level = "SL"
+topic = st.session_state.get("prefill_topic", "Price Elasticity of Demand")
+difficulty = "Beginner"
+
+if board == "IB":
+    subject = st.sidebar.selectbox(
+        "Subject",
+        ["IB Economics", "IB Math AA", "IB Business Management", "IB History", "IB French Ab Initio"],
+        index=0
+    )
+    level = st.sidebar.selectbox("Level", ["SL", "HL"], index=0)
+    topic = st.sidebar.text_input("Topic", value=topic)
+    difficulty = st.sidebar.selectbox("Difficulty", ["Beginner", "Advanced"], index=0)
+
+elif board == "UG":
+    subject = st.sidebar.selectbox("Subject", ["Finance"], index=0)
+    level = st.sidebar.selectbox("Level", ["Sem-wise", "General"], index=0)
+
+    fin = load_finance_index() or {}
+    sem_keys = sorted(
+        (fin.get("semesters") or {}).keys(),
+        key=lambda s: (s == "0", int(s) if str(s).isdigit() else 9999)
+    )
+    sem_label = st.sidebar.selectbox("Semester", ["All"] + sem_keys, index=0)
+
+    courses_for_sem = []
+    if sem_label == "All":
+        for _, arr in (fin.get("semesters") or {}).items():
+            courses_for_sem.extend(arr or [])
+        # unique while preserving order
+        seen = set()
+        courses_for_sem = [c for c in courses_for_sem if c not in seen and not seen.add(c)]
+    else:
+        courses_for_sem = (fin.get("semesters", {}).get(sem_label) or [])
+
+    course = st.sidebar.selectbox(
+        "Course",
+        ["(no courses)"] + courses_for_sem,
+        index=0
+    )
+
+    # Create a topic string that our engine can use
+    if course and course != "(no courses)":
+        topic = f"UG Finance — {course}"
+    elif sem_label != "All":
+        topic = f"UG Finance — Semester {sem_label}"
+    else:
+        topic = "UG Finance — Overview"
+
+    difficulty = st.sidebar.selectbox("Difficulty", ["Beginner", "Advanced"], index=0)
+
+else:
+    # Other boards kept simple for now
+    subject = st.sidebar.selectbox("Subject", ["English"], index=0)
+    level = st.sidebar.selectbox("Level", ["General"], index=0)
+    topic = st.sidebar.text_input("Topic", value=topic)
+    difficulty = st.sidebar.selectbox("Difficulty", ["Beginner", "Advanced"], index=0)
+
+# =============================================================================
+# Generate content
+# =============================================================================
+
+st.title("Student Mode")
+if st.button("Generate Study Package", use_container_width=True):
+    st.session_state["pkg"] = generate_package(subject, level, board, topic, difficulty)
+
+pkg = st.session_state.get("pkg")
+if not pkg:
+    st.info("Enter your selections and click **Generate Study Package** to see your unit.")
+    st.stop()
+
+tab1, tab2, tab3, tab4, tab5 = st.tabs(["Study Guide", "Interactive", "Case Study", "Practice", "Review"])
+
+# =============================================================================
+# Study Guide
+# =============================================================================
+with tab1:
+    sg = pkg.get("study_guide", {}) if isinstance(pkg, dict) else {}
+    st.subheader("Intro")
+    st.write(sg.get("intro", "This topic introduces key ideas and why they matter."))
+
+    st.subheader("What is it?")
+    for p in (sg.get("concept") or []):
+        st.write("• " + str(p))
+
+    st.subheader("Citations")
+    # retrieval is scoped to subject/topic; fall back to topic-only
+    hits = search_snippets(topic, subject=subject) if "search_snippets" in globals() else []
+    if not hits:
+        st.caption("No matching sources yet. Use **Admin Tools → Ingest PDFs** and **Build Index**, then try again.")
+    else:
+        for h in hits:
+            st.write(f"• {h.get('source','?')} — p.{h.get('page','?')}")
+
+    st.subheader("Examples")
+    for e in (sg.get("examples") or []):
+        st.write("• " + str(e))
+
+    we = pkg.get("worked_example", {}) if isinstance(pkg, dict) else {}
+    if we:
+        st.subheader("Worked Example")
+        for s in (we.get("steps") or []):
+            st.write("- " + str(s))
+        if we.get("answer"):
+            st.success("Answer: " + str(we["answer"]))
+
+# =============================================================================
+# Interactive
+# =============================================================================
+with tab2:
+    st.subheader("Interactive")
+    render_auto_ui(subject, topic)
+
+# =============================================================================
+# Case Study (placeholder shows the linked sim)
+# =============================================================================
+with tab3:
+    st.subheader("Case Study (Sim)")
+    st.caption("Registry wired; paste your sim URLs into interactive/case_studies/registry.json.")
+    st.code("https://skillnestcasestudysim-d6355.web.app/sim?caseId=nike_outsourcing")
+
+# =============================================================================
+# Practice (MCQ / SAQ / LAQ) + logging
+# =============================================================================
+with tab4:
+    pr = pkg.get("practice", {}) if isinstance(pkg, dict) else {}
+
+    st.subheader("Practice")
+
+    # MCQs
+    if pr.get("mcq"):
+        st.markdown("**MCQ**")
+        for i, q in enumerate(pr["mcq"], 1):
+            stem = q.get("stem", f"Question {i}")
+            options = q.get("options", [])
+            answer = q.get("answer")
+            choice = st.radio(stem, options, key=f"mcq{i}")
+            if st.button(f"Submit MCQ {i}"):
+                res = grade_mcq(choice, answer)
+                st.write("✅ Correct" if res["score"] == 1 else f"❌ {res['feedback']}")
+                log_attempt(role, EMAIL, subject, topic, "MCQ", f"Q{i}:{stem}|{choice}",
+                            score=res["score"], feedback=res["feedback"])
+    else:
+        st.caption("No MCQs generated for this topic.")
+
+    # SAQ
+    st.markdown("**SAQ (4 marks)**")
+    saq_text = st.text_area("Your answer", key="saq")
+    if st.button("Submit SAQ"):
+        res = grade_saq(saq_text, ["definition", "formula", "interpretation", "real-world"])
+        st.info(f"Score {res['score']}/4 — {res['feedback']}")
+        log_attempt(role, EMAIL, subject, topic, "SAQ", saq_text,
+                    score=res["score"], feedback=res["feedback"])
+
+    # LAQ
+    st.markdown("**LAQ (15 marks)**")
+    laq_text = st.text_area("Your essay", key="laq")
+    if st.button("Submit LAQ"):
+        res = grade_laq(laq_text, ["explain", "analyse", "evaluate", "diagram", "real world", "conclusion"])
+        st.info(f"Score {res['score']}/15 — {res['feedback']}")
+        log_attempt(role, EMAIL, subject, topic, "LAQ", laq_text,
+                    score=res["score"], feedback=res["feedback"])
+
+# =============================================================================
+# Review
+# =============================================================================
+with tab5:
+    rv = pkg.get("revision", {}) if isinstance(pkg, dict) else {}
+    st.subheader("Revision")
+    for n in (rv.get("notes") or []):
+        st.write("• " + str(n))
+    if rv.get("exam_prep"):
+        st.write("**Exam prep:**")
+        for step in rv["exam_prep"]:
+            st.write("- " + str(step))

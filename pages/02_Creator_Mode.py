@@ -1,6 +1,15 @@
 import streamlit as st
 from ui_branding import sidebar_branding, page_watermark
 from engine_v2 import generate_package
+import sys, os
+def logout_fix():
+    import streamlit as st
+    for k in [k for k in list(st.session_state.keys()) if k.startswith("auth_") or k in ("role","email","auth_board")]:
+        st.session_state.pop(k, None)
+    st.rerun()
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
 
 st.set_page_config(page_title="SkillNestEdu — Creator Mode", layout="wide")
 
@@ -11,12 +20,11 @@ if role != "admin":
 def logout():
     for k in [k for k in st.session_state.keys() if k.startswith("auth_")]: st.session_state.pop(k, None)
     try: st.rerun()
-    except Exception: st.experimental_rerun()
+    except Exception: st.rerun()
 
 with st.container(border=True):
     st.write(f"🔐 Logged in as **{st.session_state.get('email','?')}** • Role: **{st.session_state.get('role','?').replace('_',' ').title()}**")
-    st.button("Logout", on_click=logout)
-
+    st.button("Logout", key="logout_02_creator_mode", on_click=logout_fix)
 EMAIL = st.session_state.get("email", "admin@skillnestedu.com")
 sidebar_branding(EMAIL, "All Boards", None); page_watermark(EMAIL, None)
 

@@ -98,7 +98,7 @@ if role not in ("admin", "student_ib", "student_cbse", "student_icse", "student_
 def logout():
     for k in [k for k in st.session_state.keys() if k.startswith("auth_")]: st.session_state.pop(k, None)
     try: st.rerun()
-    except Exception: st.experimental_rerun()
+    except Exception: st.rerun()
 
 with st.container(border=True):
     st.write(f"🔐 Logged in as **{st.session_state.get('auth_email','?')}** • Role: **{st.session_state.get('auth_role','?').replace('_',' ').title()}** • Board: **{st.session_state.get('auth_board','—')}**")
@@ -188,7 +188,7 @@ if role != "admin":
 def logout():
     for k in [k for k in st.session_state.keys() if k.startswith("auth_")]: st.session_state.pop(k, None)
     try: st.rerun()
-    except Exception: st.experimental_rerun()
+    except Exception: st.rerun()
 
 with st.container(border=True):
     st.write(f"🔐 Logged in as **{st.session_state.get('auth_email','?')}** • Role: **{st.session_state.get('auth_role','?').replace('_',' ').title()}**")

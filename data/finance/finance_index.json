@@ -1,0 +1,20 @@
+{
+  "semesters": {
+    "1": {
+      "courses": {
+        "FM_A1": {
+          "name": "Financial Mathematics I",
+          "topics": ["Time value of money", "Simple vs compound interest", "Annuities"]
+        }
+      }
+    },
+    "2": {
+      "courses": {
+        "FM_A2": {
+          "name": "Corporate Finance Basics",
+          "topics": ["Capital budgeting", "Cost of capital", "NPV/IRR"]
+        }
+      }
+    }
+  }
+}
